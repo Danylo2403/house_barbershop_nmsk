@@ -1,0 +1,296 @@
+.footer {
+  background: #0f0f0f;
+  color: #fff;
+  padding: 40px 0 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.footer-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Верхняя часть */
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #333;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.scissors {
+  font-size: 3rem;
+  animation: cut 2s infinite;
+}
+
+@keyframes cut {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+.footer-logo h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+  color: #d4af37; /* Золотой цвет вместо градиента */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Альтернатива с градиентом для поддерживающих браузеров */
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .footer-logo h2 {
+    background: linear-gradient(45deg, #fff, #d4af37);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+}
+
+.instagram-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(
+    45deg,
+    #405de6,
+    #5851db,
+    #833ab4,
+    #c13584,
+    #e1306c,
+    #fd1d1d
+  );
+  color: white;
+  text-decoration: none;
+  padding: 12px 25px;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.instagram-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.instagram-btn span {
+  font-size: 1.2rem;
+}
+
+/* Средняя часть */
+.footer-middle {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+.footer-column h3 {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #d4af37;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.footer-column h3::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: #d4af37;
+}
+
+.contact-info p,
+.working-hours p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: #ccc;
+  line-height: 1.4;
+}
+
+.contact-info span,
+.working-hours span {
+  color: #d4af37;
+  font-size: 1.1rem;
+  min-width: 24px;
+}
+
+.footer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-nav a {
+  color: #ccc;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 5px 0;
+  position: relative;
+  width: fit-content;
+}
+
+.footer-nav a:hover {
+  color: #d4af37;
+  transform: translateX(5px);
+}
+
+.footer-nav a::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #d4af37;
+  transition: width 0.3s ease;
+}
+
+.footer-nav a:hover::after {
+  width: 100%;
+}
+
+/* Нижняя часть */
+.footer-bottom {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.copyright {
+  margin-bottom: 5px;
+}
+
+.made-with {
+  color: #aaa;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .footer-top {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-logo {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-middle {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .footer-column {
+    text-align: center;
+  }
+
+  .footer-column h3::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .contact-info p,
+  .working-hours p {
+    justify-content: center;
+  }
+
+  .footer-nav {
+    align-items: center;
+  }
+}
+
+/* Стили для кнопки входа барберов */
+.barber-login-btn {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  color: #d4af37;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.barber-login-btn:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #d4af37;
+  transform: translateY(-2px);
+}
+
+/* Обновите стили footer-bottom */
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.footer-bottom .copyright {
+  order: 1;
+}
+
+.footer-bottom .barber-login-btn {
+  order: 2;
+}
+
+.footer-bottom .made-with {
+  order: 3;
+}
+
+@media (max-width: 768px) {
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .footer-bottom .copyright,
+  .footer-bottom .barber-login-btn,
+  .footer-bottom .made-with {
+    order: 0;
+    width: 100%;
+  }
+
+  .barber-login-btn {
+    justify-content: center;
+  }
+}

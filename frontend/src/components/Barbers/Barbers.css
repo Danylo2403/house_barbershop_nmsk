@@ -1,0 +1,44 @@
+.barbers {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 40px;
+}
+
+.barber-card {
+  background: #111;
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  color: white;
+}
+
+.barber-photo {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.barber-card button {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #fbbf24;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .barbers {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .barbers {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+}

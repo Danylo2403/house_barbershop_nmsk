@@ -1,0 +1,220 @@
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+}
+
+.sheet {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  max-height: 85vh;
+  background: #111;
+  border-radius: 24px 24px 0 0;
+  padding: 20px;
+  color: white;
+}
+
+.sheet-handle {
+  width: 40px;
+  height: 5px;
+  background: #555;
+  border-radius: 5px;
+  margin: 0 auto 16px;
+}
+
+.sheet h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sheet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sheet-form input {
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: #222;
+  color: white;
+}
+
+.sheet-form button {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  border: none;
+  background: white;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.time {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #222;
+  border: none;
+  color: white;
+}
+
+.time.active {
+  background: white;
+  color: black;
+}
+
+.phone {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  background: #222;
+  border: none;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.confirm {
+  width: 100%;
+  padding: 16px;
+  border-radius: 18px;
+  background: white;
+  color: black;
+  font-size: 16px;
+  border: none;
+}
+
+.confirm:disabled {
+  opacity: 0.4;
+}
+
+/* Добавьте в конец существующего файла */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #000;
+}
+
+.times-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.time-btn {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.time-btn:hover:not(:disabled) {
+  border-color: #000;
+  background: #f8f8f8;
+}
+
+.time-btn.active {
+  background: #000;
+  color: white;
+  border-color: #000;
+}
+
+.time-btn.busy {
+  background: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.selected-time {
+  margin-top: 10px;
+  padding: 10px;
+  background: #e9f7fe;
+  border-radius: 6px;
+  color: #0c5460;
+  text-align: center;
+  font-weight: 500;
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: #000;
+}
+
+.confirm-btn {
+  width: 100%;
+  padding: 16px;
+  background: #000;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 10px;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background: #333;
+}
+
+.confirm-btn.disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}

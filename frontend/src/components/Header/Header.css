@@ -1,0 +1,327 @@
+/* ===== ОСНОВНЫЕ СТИЛИ ===== */
+.header {
+  background: #000;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid #d4af37;
+}
+
+.header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 70px;
+}
+
+/* ===== ЛОГОТИП ===== */
+.logo {
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+  z-index: 1001;
+}
+
+.logo:hover {
+  opacity: 0.9;
+}
+
+.logo-text {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+.logo-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.logo-subtitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #d4af37;
+  letter-spacing: 0.5px;
+}
+
+.logo-tagline {
+  font-size: 12px;
+  font-weight: 400;
+  color: #fff;
+  opacity: 0.7;
+  letter-spacing: 1px;
+  margin-left: 5px;
+}
+
+/* ===== ТЕЛЕФОН ДЛЯ МОБИЛЬНЫХ ===== */
+.mobile-phone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: #d4af37;
+  color: #000;
+  border-radius: 50%;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  z-index: 1001;
+}
+
+.mobile-phone:hover {
+  background: #b8941f;
+  transform: scale(1.1);
+}
+
+/* ===== БУРГЕР-МЕНЮ ===== */
+.menu-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  z-index: 1001;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.menu-toggle:hover {
+  background-color: rgba(212, 175, 55, 0.1);
+}
+
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;
+  height: 18px;
+}
+
+.bar {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #fff;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.menu-toggle.open .bar:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.menu-toggle.open .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.open .bar:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* ===== ТЕЛЕФОН ДЛЯ ДЕСКТОПА ===== */
+.header-contact {
+  display: none;
+}
+
+/* ===== МОБИЛЬНОЕ МЕНЮ ===== */
+.mobile-menu {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  background: #0a0a0a;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  z-index: 999;
+}
+
+.mobile-menu.open {
+  max-height: calc(100vh - 70px);
+  overflow-y: auto;
+}
+
+.mobile-menu-container {
+  padding: 20px;
+}
+
+/* Мобильная навигация */
+.mobile-nav-list {
+  list-style: none;
+  margin: 0 0 30px 0;
+  padding: 0;
+}
+
+.mobile-nav-link {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 15px 0;
+  border-bottom: 1px solid #222;
+  transition: all 0.3s ease;
+}
+
+.mobile-nav-link:hover {
+  color: #d4af37;
+  padding-left: 10px;
+}
+
+/* Контактная информация в мобильном меню */
+.mobile-contact {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.mobile-phone-link,
+.mobile-hours {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 0;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-phone-link:last-child {
+  border-bottom: none;
+}
+
+.phone-emoji,
+.hours-emoji {
+  font-size: 24px;
+  min-width: 40px;
+}
+
+.phone-info,
+.hours-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-label,
+.hours-label {
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 3px;
+}
+
+.phone-number,
+.hours-text {
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.mobile-booking-button {
+  display: block;
+  background: #d4af37;
+  color: #000;
+  text-decoration: none;
+  text-align: center;
+  padding: 15px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 16px;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.mobile-booking-button:hover {
+  background: #b8941f;
+}
+
+/* ===== ДЕСКТОПНАЯ ВЕРСИЯ (768px и выше) ===== */
+@media (min-width: 768px) {
+  .header-container {
+    height: 80px;
+    padding: 0 30px;
+  }
+
+  .logo-title {
+    font-size: 28px;
+  }
+
+  .logo-subtitle {
+    font-size: 24px;
+  }
+
+  .logo-tagline {
+    font-size: 14px;
+  }
+
+  .mobile-menu {
+    top: 80px;
+  }
+}
+
+/* ===== ТАБЛЕТНАЯ ВЕРСИЯ (992px и выше) ===== */
+@media (min-width: 992px) {
+  .menu-toggle,
+  .mobile-phone,
+  .mobile-menu {
+    display: none;
+  }
+
+  .header-contact {
+    display: block;
+  }
+
+  /* Телефон для десктопа */
+  .phone-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #d4af37;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 10px 20px;
+    background: #d4af37;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .phone-link:hover {
+    background: rgba(212, 175, 55, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .phone-number {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    letter-spacing: 1px;
+  }
+}
+
+/* ===== ДЕСКТОПНАЯ ВЕРСИЯ (1200px и выше) ===== */
+@media (min-width: 1200px) {
+  .header-container {
+    padding: 0 40px;
+  }
+
+  .phone-link {
+    font-size: 22px;
+    padding: 12px 25px;
+  }
+}
+
+/* ===== ОЧЕНЬ БОЛЬШИЕ ЭКРАНЫ ===== */
+@media (min-width: 1400px) {
+  .header-container {
+    padding: 0 60px;
+  }
+}
