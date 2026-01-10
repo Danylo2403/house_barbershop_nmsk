@@ -1,9 +1,10 @@
+// backend/models/Barber.js
 import mongoose from "mongoose";
 
 const barberSchema = new mongoose.Schema({
   name: {
     type: String,
-    enum: ["Сурен", "Ануш", "Кристіна"],
+    enum: ["Сурен", "Ануш", "Крістіна"],
     required: true,
   },
   workStart: {
@@ -18,6 +19,10 @@ const barberSchema = new mongoose.Schema({
     type: Number,
     default: 60
   },
+  color: {
+    type: String,
+    default: "#4CAF50"
+  }
 });
 
 export default mongoose.model("Barber", barberSchema);

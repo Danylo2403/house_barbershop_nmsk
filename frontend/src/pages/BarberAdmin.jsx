@@ -1,85 +1,63 @@
+// frontend/src/pages/BarberAdmin.jsx
 import { useEffect, useState } from "react";
 import "./BarberAdmin.css";
 
+// СЛОВНИК ПОСЛУГ (добавьте в начало)
+const SERVICE_NAMES = {
+  haircut: "Стрижка",
+  haircut_beard: "Стрижка + борода",
+  machine_haircut: "Стрижка під машинку насадками",
+  machine_haircut_beard: "Стрижка під машинку + борода",
+  long_haircut: "Подовжена стрижка",
+  father_son: "Батько + син (до 10 років)",
+  beard_design: "+ оформлення бороди",
+  father_two_sons: "Батько + син + син (до 10 років)",
+  beard_grooming: "Оформлення бороди",
+  haircut_shave: "Стрижка + гоління обличчя",
+  head_shave_beard: "Гоління голови + грумінг бороди",
+  royal_shave: "Королівське гоління голови + бороди",
+  kids_under_10: "Дитяча стрижка до 10 років",
+  teen_10_14: "Підліткова стрижка (10-14 років)",
+  hair_styling: "Укладання волосся",
+  hair_trim: "Окантовка волосся",
+  wax_one_zone: "Воск однієї зони",
+  complex_styling: "Комплекс",
+  head_camouflage: "Камуфляж голови",
+  beard_camouflage: "Камуфляж бороди",
+  head_peeling: "Пілінг голови"
+};
+
 export default function BarberAdmin({ onLogout }) {
   const [barbers, setBarbers] = useState([]);
-  const [selectedBarber, setSelectedBarber] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [viewMode, setViewMode] = useState("calendar");
+  const [selectedBooking, setSelectedBooking] = useState(null); // НОВОЕ: выбранная запись
 
-  // Загрузить барберов
+  // Завантажити барберів
   useEffect(() => {
     fetch("http://localhost:5000/api/barbers")
       .then(res => res.json())
       .then(data => {
-        console.log("📋 Barbers loaded:", data);
         setBarbers(data);
-        if (data.length > 0) {
-          setSelectedBarber(data[0]);
-        }
-      })
-      .catch(err => console.error("❌ Error loading barbers:", err));
+      });
   }, []);
 
-  // Загрузить записи при изменении барбера или даты
+  // Завантажити записи на вибрану дату
   useEffect(() => {
-    if (!selectedBarber) return;
-
     setLoading(true);
     const dateStr = selectedDate.toISOString().split("T")[0];
     
-    console.log(`📡 Loading bookings for ${selectedBarber.name} on ${dateStr}`);
-    
-    fetch(`http://localhost:5000/api/bookings/barber/${selectedBarber._id}?date=${dateStr}`)
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
+    fetch(`http://localhost:5000/api/bookings/all?date=${dateStr}`)
+      .then(res => res.json())
       .then(data => {
-        console.log("📦 Bookings data:", data);
-        setBookings(data || []);
+        setBookings(data);
         setLoading(false);
       })
-      .catch(err => {
-        console.error("❌ Error loading bookings:", err);
-        setBookings([]);
-        setLoading(false);
-      });
-  }, [selectedBarber, selectedDate]);
+      .catch(() => setLoading(false));
+  }, [selectedDate]);
 
-  // Функции для работы с датами
-  const getWeekDates = () => {
-    const dates = [];
-    const startOfWeek = new Date(selectedDate);
-    // Начинаем с понедельника (0 - воскресенье, 1 - понедельник)
-    const day = startOfWeek.getDay();
-    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1); // Корректировка если воскресенье
-    
-    startOfWeek.setDate(diff);
-    
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(startOfWeek);
-      date.setDate(startOfWeek.getDate() + i);
-      dates.push(date);
-    }
-    
-    return dates;
-  };
-
-  const getTimeSlots = () => {
-    return ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"];
-  };
-
-  const getBookingForSlot = (date, time) => {
-    const dateStr = date.toISOString().split("T")[0];
-    const booking = bookings.find(b => b.date === dateStr && b.time === time);
-    return booking;
-  };
-
+  // Форматування дати
   const formatDate = (date) => {
     return date.toLocaleDateString('uk-UA', {
       day: 'numeric',
@@ -88,81 +66,90 @@ export default function BarberAdmin({ onLogout }) {
     });
   };
 
-  const formatDay = (date) => {
-    return date.toLocaleDateString('uk-UA', {
-      weekday: 'short',
-      day: 'numeric'
-    });
+  // Часові слоти (з 9:00 до 18:00)
+  const timeSlots = [
+    "09:00", "10:00", "11:00", "12:00", 
+    "13:00", "14:00", "15:00", "16:00", 
+    "17:00", "18:00"
+  ];
+
+  // Знайти запис для барбера та часу
+  const getBooking = (barberId, time) => {
+    return bookings.find(b => 
+      b.barber?._id === barberId && 
+      b.time === time
+    );
   };
 
-  const isToday = (date) => {
-    const today = new Date();
-    return date.getDate() === today.getDate() &&
-           date.getMonth() === today.getMonth() &&
-           date.getFullYear() === today.getFullYear();
-  };
-
-  const isSelectedDay = (date) => {
-    const selected = new Date(selectedDate);
-    return date.getDate() === selected.getDate() &&
-           date.getMonth() === selected.getMonth() &&
-           date.getFullYear() === selected.getFullYear();
-  };
-
-  // Переключение недель
-  const prevWeek = () => {
+  // Навігація по днях
+  const prevDay = () => {
     const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() - 7);
+    newDate.setDate(newDate.getDate() - 1);
     setSelectedDate(newDate);
   };
 
-  const nextWeek = () => {
+  const nextDay = () => {
     const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + 7);
+    newDate.setDate(newDate.getDate() + 1);
     setSelectedDate(newDate);
   };
 
-  // Загрузить все записи
-  const loadAllBookings = () => {
-    if (!selectedBarber) return;
+  const goToToday = () => {
+    setSelectedDate(new Date());
+  };
+
+  // Функція для отримання назви послуги
+  const getServiceName = (serviceId) => {
+    return SERVICE_NAMES[serviceId] || serviceId;
+  };
+
+  // Обробник кліку на запис
+  const handleBookingClick = (booking, barber) => {
+    if (booking) {
+      setSelectedBooking({
+        ...booking,
+        barberName: barber.name,
+        barberColor: barber.color
+      });
+    }
+  };
+
+  // Закрити модальне вікно
+  const closeModal = () => {
+    setSelectedBooking(null);
+  };
+
+  // Отримати загальну суму для запису
+  const getTotalPrice = (services) => {
+    const prices = {
+      haircut: 800,
+      haircut_beard: 1000,
+      machine_haircut: 650,
+      machine_haircut_beard: 850,
+      long_haircut: 800,
+      father_son: 1250,
+      beard_design: 300,
+      father_two_sons: 1500,
+      beard_grooming: 700,
+      haircut_shave: 1000,
+      head_shave_beard: 1000,
+      royal_shave: 1000,
+      kids_under_10: 600,
+      teen_10_14: 700,
+      hair_styling: 300,
+      hair_trim: 200,
+      wax_one_zone: 150,
+      complex_styling: 450,
+      head_camouflage: 500,
+      beard_camouflage: 400,
+      head_peeling: 350
+    };
     
-    setLoading(true);
-    fetch(`http://localhost:5000/api/bookings/barber/${selectedBarber._id}/all`)
-      .then(res => res.json())
-      .then(data => {
-        console.log("📋 All bookings:", data);
-        setBookings(data || []);
-        setViewMode("list");
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("❌ Error loading all bookings:", err);
-        setBookings([]);
-        setLoading(false);
-      });
-  };
-
-  // Вернуться к календарю
-  const switchToCalendar = () => {
-    const dateStr = selectedDate.toISOString().split("T")[0];
-    setLoading(true);
-    fetch(`http://localhost:5000/api/bookings/barber/${selectedBarber._id}?date=${dateStr}`)
-      .then(res => res.json())
-      .then(data => {
-        setBookings(data || []);
-        setViewMode("calendar");
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error("❌ Error switching to calendar:", err);
-        setBookings([]);
-        setLoading(false);
-      });
-  };
-
-  // Выбрать день в календаре
-  const selectDay = (date) => {
-    setSelectedDate(date);
+    if (!services || services.length === 0) return 0;
+    
+    return services.reduce((total, serviceId) => {
+      return total + (prices[serviceId] || 0);
+    }, 0);
   };
 
   return (
@@ -170,268 +157,236 @@ export default function BarberAdmin({ onLogout }) {
       {/* Шапка */}
       <header className="admin-header">
         <div className="header-left">
-          <h1>📅 Календар записів</h1>
+          <h1>📅 Загальний календар</h1>
           <button className="logout-btn" onClick={onLogout}>
             ← Вийти
           </button>
         </div>
-        
         <div className="header-right">
-          {selectedBarber && (
-            <div className="barber-selector">
-              <span>Барбер: </span>
-              <select 
-                value={selectedBarber._id} 
-                onChange={(e) => {
-                  const barber = barbers.find(b => b._id === e.target.value);
-                  setSelectedBarber(barber);
-                }}
-              >
-                {barbers.map(barber => (
-                  <option key={barber._id} value={barber._id}>
-                    {barber.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div className="selected-date">{formatDate(selectedDate)}</div>
         </div>
       </header>
 
-      {/* Управление */}
-      <div className="admin-controls">
-        <div className="date-navigation">
-          <button className="nav-btn" onClick={prevWeek}>←</button>
-          <div className="current-week">
-            {formatDate(getWeekDates()[0])} - {formatDate(getWeekDates()[6])}
-          </div>
-          <button className="nav-btn" onClick={nextWeek}>→</button>
-        </div>
-        
-        <div className="view-buttons">
-          <button 
-            className={`view-btn ${viewMode === "calendar" ? "active" : ""}`}
-            onClick={switchToCalendar}
-          >
-            📅 Тиждень
-          </button>
-          <button 
-            className={`view-btn ${viewMode === "list" ? "active" : ""}`}
-            onClick={loadAllBookings}
-          >
-            📋 Всі записи
-          </button>
-          <button 
-            className="today-btn"
-            onClick={() => {
-              setSelectedDate(new Date());
-              switchToCalendar();
-            }}
-          >
-            Сьогодні
-          </button>
-        </div>
+      {/* Навігація */}
+      <div className="navigation">
+        <button className="nav-btn" onClick={prevDay}>
+          ← Вчора
+        </button>
+        <button className="nav-btn today" onClick={goToToday}>
+          Сьогодні
+        </button>
+        <button className="nav-btn" onClick={nextDay}>
+          Завтра →
+        </button>
       </div>
 
-      {/* Основной контент */}
-      <main className="admin-main">
+      {/* Календар */}
+      <main className="calendar-container">
         {loading ? (
-          <div className="loading">
-            <div className="spinner"></div>
-            <p>Завантаження записів...</p>
-          </div>
-        ) : viewMode === "calendar" ? (
-          <>
-            {/* Мини-календарь дней недели */}
-            <div className="week-days">
-              {getWeekDates().map((date, index) => (
-                <button
-                  key={index}
-                  className={`day-btn ${isToday(date) ? "today" : ""} ${isSelectedDay(date) ? "selected" : ""}`}
-                  onClick={() => selectDay(date)}
+          <div className="loading">Завантаження...</div>
+        ) : (
+          <div className="multi-calendar">
+            {/* Заголовок з іменами барберів */}
+            <div className="calendar-header">
+              <div className="time-column">Час</div>
+              {barbers.map(barber => (
+                <div 
+                  key={barber._id} 
+                  className="barber-column-header"
+                  style={{ backgroundColor: barber.color }}
                 >
-                  <div className="day-weekday">{formatDay(date).split(" ")[0]}</div>
-                  <div className="day-number">{date.getDate()}</div>
-                  {bookings.filter(b => b.date === date.toISOString().split("T")[0]).length > 0 && (
-                    <div className="day-badge">
-                      {bookings.filter(b => b.date === date.toISOString().split("T")[0]).length}
-                    </div>
-                  )}
-                </button>
+                  {barber.name}
+                </div>
               ))}
             </div>
 
-            {/* Календарь на неделю */}
-            <div className="calendar-week">
-              <div className="time-column">
-                <div className="time-header">Час</div>
-                {getTimeSlots().map(time => (
-                  <div key={time} className="time-slot">{time}</div>
-                ))}
-              </div>
-              
-              {getWeekDates().map((date, dayIndex) => (
-                <div key={dayIndex} className={`day-column ${isToday(date) ? "today" : ""}`}>
-                  <div className="day-header">
-                    <div className="day-name">{formatDay(date)}</div>
-                    {isToday(date) && <span className="today-badge">Сьогодні</span>}
-                  </div>
+            {/* Часові рядки */}
+            {timeSlots.map(time => (
+              <div key={time} className="time-row">
+                <div className="time-cell">{time}</div>
+                
+                {barbers.map(barber => {
+                  const booking = getBooking(barber._id, time);
                   
-                  <div className="day-slots">
-                    {getTimeSlots().map(time => {
-                      const booking = getBookingForSlot(date, time);
-                      return (
-                        <div 
-                          key={time} 
-                          className={`time-cell ${booking ? "booked" : "free"}`}
-                          title={booking ? `Телефон: ${booking.phone}\nЧас: ${booking.time}` : "Вільно"}
-                        >
-                          {booking ? (
-                            <div className="booking-info">
-                              <div className="client-name">📱 {booking.phone}</div>
-                              <div className="booking-time-small">{booking.time}</div>
+                  return (
+                    <div
+                      key={`${barber._id}-${time}`}
+                      className={`booking-cell ${booking ? "booked" : "free"}`}
+                      style={{
+                        backgroundColor: booking ? barber.color : "transparent",
+                        borderColor: barber.color
+                      }}
+                      onClick={() => handleBookingClick(booking, barber)}
+                    >
+                      {booking ? (
+                        <div className="booking-info">
+                          <div className="client-name">{booking.clientName}</div>
+                          <div className="client-phone">{booking.phone}</div>
+                          {booking.services && booking.services.length > 0 && (
+                            <div className="service-indicator">
+                              💈 {booking.services.length}
                             </div>
-                          ) : (
-                            <div className="free-slot">—</div>
                           )}
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Легенда и статистика */}
-            <div className="calendar-footer">
-              <div className="calendar-legend">
-                <div className="legend-item">
-                  <div className="legend-color free"></div>
-                  <span>Вільно</span>
-                </div>
-                <div className="legend-item">
-                  <div className="legend-color booked"></div>
-                  <span>Заброньовано</span>
-                </div>
-                <div className="legend-item">
-                  <div className="legend-color today"></div>
-                  <span>Сьогодні</span>
-                </div>
+                      ) : (
+                        <span className="free-text">—</span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-              
-              <div className="calendar-stats">
-                <div className="stat-item">
-                  <span className="stat-number">{bookings.length}</span>
-                  <span className="stat-label">всього записів</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-number">
-                    {bookings.filter(b => {
-                      const bookingTime = parseInt(b.time.split(":")[0]);
-                      return bookingTime < new Date().getHours();
-                    }).length}
-                  </span>
-                  <span className="stat-label">раніше</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-number">
-                    {bookings.filter(b => {
-                      const bookingTime = parseInt(b.time.split(":")[0]);
-                      return bookingTime >= new Date().getHours();
-                    }).length}
-                  </span>
-                  <span className="stat-label">пізніше</span>
-                </div>
-              </div>
-            </div>
-          </>
-        ) : (
-          /* Список всех записей */
-          <div className="all-bookings-list">
-            <div className="list-header">
-              <h2>Всі записи</h2>
-              <div className="total-count">{bookings.length} записів</div>
-            </div>
-            
-            {bookings.length === 0 ? (
-              <div className="no-bookings">
-                <div className="empty-icon">📭</div>
-                <p>Ще немає записів</p>
-                <p className="sub">Коли клієнти запишуться, вони з'являться тут</p>
-              </div>
-            ) : (
-              <div className="bookings-by-date">
-                {(() => {
-                  const groups = {};
-                  bookings.forEach(b => {
-                    if (!groups[b.date]) groups[b.date] = [];
-                    groups[b.date].push(b);
-                  });
-                  
-                  return Object.entries(groups)
-                    .sort((a, b) => new Date(b[0]) - new Date(a[0]))
-                    .map(([date, dayBookings]) => (
-                      <div key={date} className="date-section">
-                        <div className="section-header">
-                          <h3 className="section-date">
-                            {new Date(date).toLocaleDateString('uk-UA', {
-                              weekday: 'long',
-                              day: 'numeric',
-                              month: 'long',
-                              year: 'numeric'
-                            })}
-                          </h3>
-                          <span className="section-count"> ({dayBookings.length})</span>
-                        </div>
-                        
-                        <div className="bookings-grid">
-                          {dayBookings.sort((a, b) => a.time.localeCompare(b.time)).map(booking => (
-                            <div key={booking._id} className="booking-item">
-                              <div className="booking-time">{booking.time}</div>
-                              <div className="booking-details">
-                                <div className="booking-client">
-                                  <span className="phone-icon">📱</span>
-                                  <span className="phone-number">{booking.phone}</span>
-                                </div>
-                                <div className="booking-meta">
-                                  <span className="booking-id">ID: {booking._id?.slice(-6) || 'N/A'}</span>
-                                  <span className="booking-created">
-                                    {new Date(booking.createdAt).toLocaleTimeString('uk-UA', {
-                                      hour: '2-digit',
-                                      minute: '2-digit'
-                                    })}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ));
-                })()}
-              </div>
-            )}
+            ))}
           </div>
         )}
       </main>
 
-      {/* Футер */}
-      <footer className="admin-footer">
-        <div className="footer-info">
-          <div className="info-item">
-            <span className="info-label">Барбер:</span>
-            <span className="info-value">{selectedBarber?.name || "Не вибрано"}</span>
+      {/* Легенда */}
+      <div className="legend">
+        <h3>Легенда:</h3>
+        <div className="legend-items">
+          {barbers.map(barber => (
+            <div key={barber._id} className="legend-item">
+              <div 
+                className="color-box" 
+                style={{ backgroundColor: barber.color }}
+              />
+              <span>{barber.name}</span>
+            </div>
+          ))}
+          <div className="legend-item">
+            <div className="color-box free">—</div>
+            <span>Вільно</span>
           </div>
-          <div className="info-item">
-            <span className="info-label">Оновлено:</span>
-            <span className="info-value">{new Date().toLocaleTimeString('uk-UA')}</span>
+          <div className="legend-item">
+            <div className="color-box indicator">💈</div>
+            <span>Є послуги</span>
           </div>
-          <div className="info-item">
-            <span className="info-label">Режим:</span>
-            <span className="info-value">{viewMode === "calendar" ? "Календар" : "Список"}</span>
+        </div>
+      </div>
+
+      {/* Статистика */}
+      <footer className="stats-footer">
+        <div className="stats">
+          <div className="stat-item">
+            <div className="stat-number">{bookings.length}</div>
+            <div className="stat-label">Всього записів</div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-number">{barbers.length}</div>
+            <div className="stat-label">Барберів</div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-number">
+              {new Date().toLocaleTimeString('uk-UA', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+              })}
+            </div>
+            <div className="stat-label">Час</div>
           </div>
         </div>
       </footer>
+
+      {/* Модальне вікно деталей запису */}
+      {selectedBooking && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Деталі запису</h2>
+              <button className="modal-close" onClick={closeModal}>
+                ×
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              {/* Барбер */}
+              <div className="detail-row">
+                <div className="detail-label">Барбер:</div>
+                <div 
+                  className="detail-value barber-name"
+                  style={{ color: selectedBooking.barberColor }}
+                >
+                  {selectedBooking.barberName}
+                </div>
+              </div>
+              
+              {/* Дата та час */}
+              <div className="detail-row">
+                <div className="detail-label">Дата:</div>
+                <div className="detail-value">
+                  {formatDate(new Date(selectedBooking.date + "T00:00:00"))}
+                </div>
+              </div>
+              
+              <div className="detail-row">
+                <div className="detail-label">Час:</div>
+                <div className="detail-value time">{selectedBooking.time}</div>
+              </div>
+              
+              {/* Клієнт */}
+              <div className="detail-section">
+                <h3>👤 Клієнт</h3>
+                <div className="detail-row">
+                  <div className="detail-label">Ім'я:</div>
+                  <div className="detail-value">{selectedBooking.clientName}</div>
+                </div>
+                <div className="detail-row">
+                  <div className="detail-label">Телефон:</div>
+                  <div className="detail-value phone">{selectedBooking.phone}</div>
+                </div>
+              </div>
+              
+              {/* Послуги */}
+              <div className="detail-section">
+                <h3>💈 Послуги</h3>
+                {selectedBooking.services && selectedBooking.services.length > 0 ? (
+                  <>
+                    <div className="services-list">
+                      {selectedBooking.services.map((serviceId, index) => (
+                        <div key={index} className="service-item">
+                          <div className="service-name">{getServiceName(serviceId)}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="total-price">
+                      Загальна сума: <strong>{getTotalPrice(selectedBooking.services)} грн</strong>
+                    </div>
+                  </>
+                ) : (
+                  <div className="no-services">Послуги не вказані</div>
+                )}
+              </div>
+              
+              {/* Додаткова інформація */}
+              <div className="detail-section">
+                <h3>📋 Додатково</h3>
+                <div className="detail-row">
+                  <div className="detail-label">ID запису:</div>
+                  <div className="detail-value id">{selectedBooking._id?.slice(-8)}</div>
+                </div>
+                <div className="detail-row">
+                  <div className="detail-label">Створено:</div>
+                  <div className="detail-value">
+                    {new Date(selectedBooking.createdAt).toLocaleString('uk-UA')}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <button className="modal-btn close-btn" onClick={closeModal}>
+                Закрити
+              </button>
+              <button 
+                className="modal-btn call-btn"
+                onClick={() => window.open(`tel:${selectedBooking.phone}`)}
+              >
+                📞 Зателефонувати
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

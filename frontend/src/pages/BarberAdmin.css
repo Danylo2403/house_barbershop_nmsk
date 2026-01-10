@@ -1,1040 +1,767 @@
+/* frontend/src/pages/BarberAdmin.css */
 .barber-admin {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: #f5f5f5;
+  padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* Шапка */
 .admin-header {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  color: white;
-  padding: 20px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
 .header-left h1 {
-  margin: 0;
+  margin: 0 0 10px 0;
   font-size: 24px;
-  font-weight: 600;
+  color: #333;
 }
 
 .logout-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 8px 16px;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  transition: all 0.3s;
+  color: #666;
+  transition: all 0.2s;
 }
 
 .logout-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #e9ecef;
+  border-color: #ccc;
 }
 
-.barber-selector {
+.selected-date {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  padding: 8px 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+/* Навігація */
+.navigation {
   display: flex;
-  align-items: center;
+  justify-content: center;
   gap: 10px;
-}
-
-.barber-selector select {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 8px 15px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.barber-selector select option {
-  background: #2d2d2d;
-  color: white;
-}
-
-/* Управление */
-.admin-controls {
-  background: white;
-  padding: 20px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #eaeaea;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.date-navigation {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  margin: 20px 0;
+  padding: 0 15px;
 }
 
 .nav-btn {
-  background: #f0f0f0;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 18px;
+  flex: 1;
+  max-width: 150px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 8px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s;
+  font-size: 14px;
+  transition: all 0.2s;
 }
 
 .nav-btn:hover {
-  background: #e0e0e0;
-}
-
-.current-week {
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-  min-width: 300px;
-  text-align: center;
-}
-
-.view-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.view-btn,
-.today-btn {
-  padding: 10px 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.view-btn:hover,
-.today-btn:hover {
-  border-color: #666;
-}
-
-.view-btn.active {
-  background: #1a1a1a;
-  color: white;
-  border-color: #1a1a1a;
-}
-
-.today-btn {
-  background: #4caf50;
-  color: white;
-  border-color: #4caf50;
-}
-
-/* Основной контент */
-.admin-main {
-  padding: 30px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-/* Загрузка */
-.loading {
-  text-align: center;
-  padding: 60px;
-  color: #666;
-  font-size: 18px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #000;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-/* Мини-календарь дней недели */
-.week-days {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 30px;
-  padding: 15px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.day-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 12px 15px;
-  border: 2px solid transparent;
   background: #f8f9fa;
+  border-color: #007bff;
+}
+
+.nav-btn.today {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+  font-weight: 600;
+}
+
+.nav-btn.today:hover {
+  background: #0056b3;
+}
+
+/* Календар */
+.calendar-container {
+  background: white;
   border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s;
-  min-width: 70px;
-  position: relative;
-}
-
-.day-btn:hover {
-  background: #e9ecef;
-  transform: translateY(-2px);
-}
-
-.day-btn.today {
-  background: #e3f2fd;
-  border-color: #2196f3;
-}
-
-.day-btn.selected {
-  background: #000;
-  color: white;
-}
-
-.day-weekday {
-  font-size: 12px;
-  font-weight: 600;
-  color: #666;
-  margin-bottom: 5px;
-  text-transform: uppercase;
-}
-
-.day-btn.selected .day-weekday {
-  color: #fff;
-}
-
-.day-number {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-
-.day-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #4caf50;
-  color: white;
-  font-size: 11px;
-  font-weight: 600;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Календарь на неделю */
-.calendar-week {
-  display: grid;
-  grid-template-columns: 100px repeat(7, 1fr);
-  gap: 1px;
-  background: #e0e0e0;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
 }
 
-.time-column,
-.day-column {
-  background: white;
+.multi-calendar {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.time-header {
-  padding: 20px;
-  font-weight: 600;
-  color: #333;
-  text-align: center;
-  background: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
-  height: 80px;
+.calendar-header {
   display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.day-header {
-  padding: 15px;
-  text-align: center;
-  border-bottom: 1px solid #e0e0e0;
-  height: 80px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.day-name {
-  font-weight: 600;
-  color: #333;
-  font-size: 16px;
-}
-
-.today-badge {
-  background: #4caf50;
+  background: #343a40;
   color: white;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 11px;
-  margin-top: 5px;
+  border-bottom: 2px solid #495057;
 }
 
-.day-column.today {
-  background: #f0f9ff;
-}
-
-.day-column.today .day-header {
-  background: #e3f2fd;
-}
-
-.time-slot {
-  height: 70px;
-  padding: 10px;
-  border-bottom: 1px solid #f0f0f0;
+.time-column {
+  width: 80px;
+  padding: 15px;
+  font-weight: 600;
+  text-align: center;
+  border-right: 1px solid #495057;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
-  font-weight: 500;
+}
+
+.barber-column-header {
+  flex: 1;
+  padding: 15px 10px;
+  text-align: center;
+  font-weight: 600;
+  color: white;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.barber-column-header:last-child {
+  border-right: none;
+}
+
+/* Часові рядки */
+.time-row {
+  display: flex;
+  border-bottom: 1px solid #eee;
+  min-height: 70px;
+}
+
+.time-row:last-child {
+  border-bottom: none;
 }
 
 .time-cell {
-  height: 70px;
-  border-bottom: 1px solid #f0f0f0;
-  padding: 8px;
-  transition: all 0.3s;
+  width: 80px;
+  padding: 10px;
+  background: #f8f9fa;
+  font-weight: 500;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #eee;
+  font-size: 14px;
+  color: #495057;
+}
+
+.booking-cell {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid;
+  margin: 1px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 65px;
   position: relative;
 }
 
-.time-cell:hover {
-  background: #f8f9fa;
-  transform: scale(1.02);
-  z-index: 1;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.booking-cell:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 2;
 }
 
-.time-cell.free {
-  background: #f8f9fa;
+.booking-cell.booked {
+  color: white;
 }
 
-.time-cell.booked {
-  background: #e8f5e9;
-  border-left: 4px solid #4caf50;
+.booking-cell.free {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  border-style: dashed;
 }
 
 .booking-info {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
+  width: 100%;
   padding: 5px;
-  overflow: hidden;
 }
 
 .client-name {
   font-weight: 600;
-  color: #2e7d32;
-  font-size: 12px;
-  margin-bottom: 3px;
-  text-align: center;
-  white-space: nowrap;
+  font-size: 13px;
+  margin-bottom: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 100%;
+  white-space: nowrap;
 }
 
-.booking-time-small {
+.client-phone {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.free-text {
+  color: #adb5bd;
+  font-style: italic;
+  font-size: 14px;
+}
+
+/* Індикатор послуг у календарі */
+.service-indicator {
   font-size: 10px;
-  color: #666;
-  text-align: center;
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 2px 5px;
+  border-radius: 10px;
+  margin-top: 3px;
+  display: inline-block;
 }
 
-.free-slot {
-  height: 100%;
+.color-box.indicator {
+  background: white;
+  border: 1px solid #dee2e6;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #bbb;
-  font-size: 24px;
-  font-weight: 300;
+  font-size: 12px;
 }
 
 /* Легенда */
-.calendar-legend {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  margin-top: 30px;
-  padding: 20px;
+.legend {
   background: white;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.legend h3 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.legend-color {
+.color-box {
   width: 20px;
   height: 20px;
   border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.legend-color.free {
-  background: #f8f9fa;
-  border: 1px solid #ddd;
-}
-
-.legend-color.booked {
-  background: #e8f5e9;
-  border-left: 4px solid #4caf50;
-}
-
-.legend-color.today {
-  background: #e3f2fd;
-  border: 1px solid #2196f3;
-}
-
-/* Футер календаря */
-.calendar-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 30px;
-  padding: 20px;
+.color-box.free {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 2px dashed #dee2e6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #adb5bd;
 }
 
-.calendar-stats {
+/* Статистика */
+.stats-footer {
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.stats {
   display: flex;
-  gap: 25px;
+  justify-content: space-around;
 }
 
 .stat-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  text-align: center;
 }
 
 .stat-number {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
-  color: #000;
-  line-height: 1;
+  color: #007bff;
+  margin-bottom: 5px;
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: 13px;
   color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 5px;
 }
 
-/* Список всех записей */
-.all-bookings-list {
+/* Завантаження */
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+  color: #666;
+}
+
+/* Мобільна версія */
+@media (max-width: 768px) {
+  .barber-admin {
+    padding: 10px;
+  }
+
+  .admin-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .header-right {
+    width: 100%;
+  }
+
+  .selected-date {
+    width: 100%;
+    text-align: center;
+  }
+
+  .navigation {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-btn {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .calendar-header {
+    overflow-x: auto;
+  }
+
+  .time-column {
+    width: 60px;
+    padding: 10px 5px;
+    font-size: 12px;
+  }
+
+  .barber-column-header {
+    min-width: 100px;
+    padding: 10px 5px;
+    font-size: 13px;
+  }
+
+  .time-cell {
+    width: 60px;
+    padding: 8px 5px;
+    font-size: 12px;
+  }
+
+  .booking-cell {
+    min-width: 100px;
+    min-height: 60px;
+  }
+
+  .client-name {
+    font-size: 11px;
+  }
+
+  .client-phone {
+    font-size: 10px;
+  }
+
+  .legend-items {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .stats {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .stat-number {
+    font-size: 20px;
+  }
+}
+
+/* Дуже маленькі екрани */
+@media (max-width: 480px) {
+  .barber-column-header {
+    min-width: 80px;
+    font-size: 12px;
+    padding: 8px 3px;
+  }
+
+  .booking-cell {
+    min-width: 80px;
+    min-height: 55px;
+    padding: 5px;
+  }
+
+  .client-name {
+    font-size: 10px;
+  }
+
+  .client-phone {
+    display: none;
+  }
+
+  .free-text {
+    font-size: 12px;
+  }
+
+  .legend h3 {
+    font-size: 14px;
+  }
+
+  .legend-item {
+    font-size: 13px;
+  }
+}
+
+/* Модальне вікно */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
   background: white;
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
 }
 
-.all-bookings-list h2 {
-  margin-top: 0;
-  color: #333;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #f0f0f0;
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-.list-header {
+.modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #f0f0f0;
-}
-
-.list-header h2 {
-  margin: 0;
-  color: #333;
-}
-
-.total-count {
-  background: #000;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.no-bookings {
-  text-align: center;
-  padding: 60px;
-  color: #999;
-  font-size: 18px;
-}
-
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
-  opacity: 0.5;
-}
-
-.no-bookings .sub {
-  font-size: 14px;
-  color: #888;
-  margin-top: 10px;
-}
-
-/* Группировка по датам */
-.date-section {
-  margin-bottom: 30px;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
+  padding: 20px;
   border-bottom: 1px solid #eee;
-}
-
-.section-date {
-  margin: 0;
-  color: #444;
-  font-size: 18px;
-}
-
-.section-count {
-  color: #4caf50;
-  font-weight: 600;
-  margin-left: 10px;
-}
-
-.bookings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 15px;
-}
-
-.booking-item {
-  background: #f8f9fa;
-  border-radius: 10px;
-  padding: 15px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  transition: all 0.3s;
-}
-
-.booking-item:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.booking-time {
-  background: #1a1a1a;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-weight: 600;
-  min-width: 70px;
-  text-align: center;
-}
-
-.booking-details {
-  flex: 1;
-}
-
-.booking-client {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 5px;
-  display: flex;
-  align-items: center;
-}
-
-.phone-icon {
-  margin-right: 8px;
-  font-size: 14px;
-}
-
-.phone-number {
-  font-weight: 600;
-  color: #333;
-}
-
-.booking-meta {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  font-size: 11px;
-  color: #888;
-}
-
-.booking-id {
-  font-family: monospace;
-  background: #f5f5f5;
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-
-.booking-created {
-  color: #666;
-}
-
-/* Футер админки */
-.admin-footer {
+  position: sticky;
+  top: 0;
   background: white;
-  padding: 20px 30px;
-  border-top: 1px solid #eaeaea;
-  margin-top: 30px;
+  border-radius: 16px 16px 0 0;
+  z-index: 10;
 }
 
-.footer-info {
+.modal-header h2 {
+  margin: 0;
+  font-size: 22px;
+  color: #333;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #666;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
-  border-top: 1px solid #eee;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
 }
 
-.info-item {
+.modal-close:hover {
+  background: #f8f9fa;
+  color: #333;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.detail-section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.detail-section h3 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #555;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.info-label {
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  font-size: 14px;
   color: #666;
-  font-size: 14px;
+  font-weight: 500;
+  min-width: 120px;
 }
 
-.info-value {
-  font-weight: 600;
+.detail-value {
+  font-size: 15px;
   color: #333;
-  font-size: 14px;
+  text-align: right;
+  flex: 1;
 }
 
-/* ============================= */
-/* МОБИЛЬНАЯ ВЕРСИЯ КАЛЕНДАРЯ */
-/* ============================= */
+.detail-value.barber-name {
+  font-weight: 600;
+  font-size: 16px;
+}
 
+.detail-value.time {
+  font-size: 18px;
+  font-weight: 700;
+  color: #007bff;
+}
+
+.detail-value.phone {
+  font-size: 16px;
+  font-weight: 600;
+  color: #28a745;
+}
+
+.detail-value.id {
+  font-family: monospace;
+  color: #6c757d;
+  font-size: 13px;
+}
+
+/* Список послуг */
+.services-list {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 15px;
+  margin: 15px 0;
+}
+
+.service-item {
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s;
+}
+
+.service-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.service-item:last-child {
+  margin-bottom: 0;
+}
+
+.service-name {
+  font-size: 15px;
+  color: #333;
+  font-weight: 500;
+}
+
+.no-services {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.total-price {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #28a745;
+  padding: 15px;
+  background: #e8f5e9;
+  border-radius: 10px;
+  margin-top: 15px;
+  border: 2px solid #c3e6cb;
+}
+
+/* Футер модального вікна */
+.modal-footer {
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  border-top: 1px solid #eee;
+  background: #f8f9fa;
+  border-radius: 0 0 16px 16px;
+}
+
+.modal-btn {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.close-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.close-btn:hover {
+  background: #5a6268;
+}
+
+.call-btn {
+  background: #28a745;
+  color: white;
+}
+
+.call-btn:hover {
+  background: #218838;
+}
+
+/* Адаптація для мобільних */
 @media (max-width: 768px) {
-  .barber-admin {
-    padding: 0;
+  .modal-content {
+    max-width: 95%;
+    max-height: 85vh;
   }
 
-  .admin-header {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
+  .modal-header {
     padding: 15px;
   }
 
-  .header-left {
-    flex-direction: column;
-    width: 100%;
+  .modal-header h2 {
+    font-size: 18px;
   }
 
-  .header-left h1 {
-    font-size: 20px;
-    text-align: center;
-  }
-
-  .logout-btn {
-    width: 100%;
-    padding: 10px;
-  }
-
-  .barber-selector {
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .barber-selector select {
-    flex: 1;
-    max-width: 200px;
-  }
-
-  .admin-controls {
-    flex-direction: column;
-    gap: 15px;
+  .modal-body {
     padding: 15px;
   }
 
-  .date-navigation {
-    width: 100%;
-    justify-content: space-between;
-    order: 1;
+  .detail-row {
+    /* flex-direction: column; */
+    /* align-items: flex-start; */
+    /* gap: 5px; */
+    gap: 10px;
   }
 
-  .nav-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 16px;
-  }
-
-  .current-week {
+  .detail-label {
     min-width: auto;
-    font-size: 16px;
-    flex: 1;
-    text-align: center;
-  }
-
-  .view-buttons {
-    order: 2;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: 100%;
-  }
-
-  .view-btn,
-  .today-btn {
-    padding: 8px 12px;
-    font-size: 13px;
-    flex: 1;
-    min-width: 120px;
-    justify-content: center;
-  }
-
-  .admin-main {
-    padding: 15px;
-  }
-
-  /* Мобильный мини-календарь */
-  .week-days {
-    overflow-x: auto;
-    padding: 10px;
-    gap: 8px;
-    margin-bottom: 20px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .week-days::-webkit-scrollbar {
-    display: none;
-  }
-
-  .day-btn {
-    min-width: 55px;
-    padding: 8px 10px;
-    flex-shrink: 0;
-  }
-
-  .day-weekday {
-    font-size: 10px;
-  }
-
-  .day-number {
-    font-size: 18px;
-  }
-
-  .day-badge {
-    width: 16px;
-    height: 16px;
-    font-size: 9px;
-    top: -6px;
-    right: -6px;
-  }
-
-  /* Мобильный календарь - вертикальный скролл */
-  .calendar-week {
-    display: block;
-    border-radius: 10px;
-    overflow: visible;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  }
-
-  .calendar-week .time-column {
-    display: none;
-  }
-
-  .calendar-week .day-column {
-    margin-bottom: 15px;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  }
-
-  .calendar-week .day-column:last-child {
-    margin-bottom: 0;
-  }
-
-  .day-header {
-    height: auto;
-    padding: 12px;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-
-  .day-name {
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .day-slots {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 12px;
-    background: #f8f9fa;
-  }
-
-  .time-cell {
-    flex: 1 0 calc(33.333% - 8px);
-    height: 60px;
-    min-width: 100px;
-    max-width: 120px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 8px;
-    margin: 0;
-    border-bottom: none;
-  }
-
-  .time-cell.booked {
-    border-left: 4px solid #4caf50;
-  }
-
-  .booking-info {
-    height: 100%;
-    justify-content: space-between;
-  }
-
-  .client-name {
-    font-size: 11px;
-    margin-bottom: 2px;
-  }
-
-  .booking-time-small {
-    font-size: 9px;
-  }
-
-  .free-slot {
-    font-size: 20px;
-  }
-
-  /* Мобильная легенда */
-  .calendar-legend {
-    flex-direction: column;
-    gap: 15px;
-    padding: 15px;
-    margin-top: 20px;
-  }
-
-  .legend-item {
-    width: 100%;
-    justify-content: center;
-  }
-
-  /* Мобильный футер календаря */
-  .calendar-footer {
-    flex-direction: column;
-    gap: 20px;
-    align-items: stretch;
-    margin-top: 20px;
-    padding: 15px;
-  }
-
-  .calendar-stats {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .stat-item {
-    flex: 1;
-  }
-
-  .stat-number {
-    font-size: 24px;
-  }
-
-  .stat-label {
-    font-size: 11px;
-  }
-
-  /* Мобильный список записей */
-  .all-bookings-list {
-    padding: 15px;
-  }
-
-  .list-header {
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-  }
-
-  .list-header h2 {
-    font-size: 18px;
-  }
-
-  .total-count {
-    align-self: flex-end;
-  }
-
-  .bookings-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .booking-item {
-    padding: 12px;
-  }
-
-  .booking-time {
-    min-width: 60px;
-    padding: 6px 10px;
     font-size: 13px;
   }
 
-  /* Мобильный футер */
-  .admin-footer {
-    padding: 15px;
-    margin-top: 20px;
-  }
-
-  .footer-info {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
-  }
-
-  .info-item {
-    width: 100%;
-    justify-content: space-between;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .info-item:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-  }
-
-  /* Улучшения для очень маленьких экранов */
-  @media (max-width: 480px) {
-    .time-cell {
-      flex: 1 0 calc(50% - 8px);
-      min-width: 0;
-    }
-
-    .view-buttons {
-      gap: 8px;
-    }
-
-    .view-btn,
-    .today-btn {
-      min-width: 0;
-      flex: 1;
-      font-size: 12px;
-      padding: 8px;
-    }
-
-    .day-btn {
-      min-width: 50px;
-    }
-
-    .day-number {
-      font-size: 16px;
-    }
-  }
-}
-
-@media (max-width: 992px) and (min-width: 769px) {
-  .calendar-week {
-    grid-template-columns: 80px repeat(7, 1fr);
+  .detail-value {
+    text-align: left;
     font-size: 14px;
   }
 
-  .time-slot,
-  .time-cell {
-    height: 60px;
+  .detail-value.time {
+    font-size: 16px;
   }
 
-  .admin-controls {
+  .service-name {
+    font-size: 14px;
+  }
+
+  .modal-footer {
     flex-direction: column;
-    gap: 15px;
-    align-items: stretch;
   }
 
-  .current-week {
-    min-width: auto;
+  .modal-btn {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    max-width: 100%;
+    border-radius: 12px 12px 0 0;
+    margin-top: auto;
+    animation: slideUpMobile 0.3s ease;
   }
 
-  .view-buttons {
-    justify-content: center;
+  @keyframes slideUpMobile {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
 
-  .week-days {
-    overflow-x: auto;
-    padding: 10px;
-    gap: 10px;
-  }
-
-  .day-btn {
-    min-width: 60px;
-    padding: 10px;
-  }
-
-  .calendar-footer {
-    flex-direction: column;
-    gap: 20px;
-    align-items: stretch;
-  }
-
-  .calendar-stats {
-    justify-content: space-between;
-  }
-
-  .footer-info {
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-  }
-
-  .bookings-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
   }
 }

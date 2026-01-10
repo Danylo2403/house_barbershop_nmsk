@@ -4,17 +4,19 @@
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(6px);
   z-index: 100;
+  display: flex;
+  align-items: flex-end;
 }
 
 .sheet {
-  position: absolute;
-  bottom: 0;
+  position: relative;
   width: 100%;
-  max-height: 85vh;
+  max-height: 90vh;
   background: #111;
   border-radius: 24px 24px 0 0;
   padding: 20px;
   color: white;
+  overflow-y: auto;
 }
 
 .sheet-handle {
@@ -28,193 +30,444 @@
 .sheet h2 {
   text-align: center;
   margin-bottom: 20px;
-}
-
-.sheet-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.sheet-form input {
-  padding: 12px;
-  border-radius: 12px;
-  border: none;
-  background: #222;
-  color: white;
-}
-
-.sheet-form button {
-  margin-top: 12px;
-  padding: 14px;
-  border-radius: 16px;
-  border: none;
-  background: white;
-  color: black;
-  font-size: 16px;
-  cursor: pointer;
+  font-size: 22px;
 }
 
 .times {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 16px 0;
+  margin: 20px 0;
+  justify-content: center;
 }
 
 .time {
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-radius: 12px;
   background: #222;
   border: none;
   color: white;
+  font-size: 15px;
+  min-width: 70px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.time:hover:not(:disabled) {
+  background: #333;
 }
 
 .time.active {
   background: white;
   color: black;
+  font-weight: 600;
 }
 
-.phone {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  background: #222;
-  border: none;
-  color: white;
-  margin-bottom: 12px;
+.time.busy {
+  background: #444;
+  color: #888;
+  cursor: not-allowed;
 }
 
-.confirm {
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.form-section .name,
+.form-section .phone {
   width: 100%;
   padding: 16px;
-  border-radius: 18px;
-  background: white;
-  color: black;
+  border-radius: 14px;
+  background: #222;
+  border: 1px solid #333;
+  color: white;
   font-size: 16px;
-  border: none;
-}
-
-.confirm:disabled {
-  opacity: 0.4;
-}
-
-/* Добавьте в конец существующего файла */
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #333;
-}
-
-.form-input {
-  width: 100%;
-  padding: 14px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 16px;
-  box-sizing: border-box;
   transition: border-color 0.3s;
 }
 
-.form-input:focus {
+.form-section .name:focus,
+.form-section .phone:focus {
   outline: none;
-  border-color: #000;
+  border-color: white;
 }
 
-.times-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 10px;
+.form-section .name::placeholder,
+.form-section .phone::placeholder {
+  color: #888;
 }
 
-.time-btn {
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-size: 14px;
+/* Компактная секция услуг */
+.services-section {
+  margin: 20px 0;
 }
 
-.time-btn:hover:not(:disabled) {
-  border-color: #000;
-  background: #f8f8f8;
-}
-
-.time-btn.active {
-  background: #000;
-  color: white;
-  border-color: #000;
-}
-
-.time-btn.busy {
-  background: #f8d7da;
-  color: #721c24;
-  border-color: #f5c6cb;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.selected-time {
-  margin-top: 10px;
-  padding: 10px;
-  background: #e9f7fe;
-  border-radius: 6px;
-  color: #0c5460;
-  text-align: center;
-  font-weight: 500;
-}
-
-.sheet-header {
+.services-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #eee;
+  margin-bottom: 10px;
 }
 
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
-  padding: 5px;
-  line-height: 1;
-}
-
-.close-btn:hover {
-  color: #000;
-}
-
-.confirm-btn {
-  width: 100%;
-  padding: 16px;
-  background: #000;
+.services-header span:first-child {
+  font-weight: 500;
   color: white;
-  border: none;
-  border-radius: 8px;
   font-size: 16px;
+}
+
+.choose-services-btn {
+  padding: 10px 15px;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.choose-services-btn:hover {
+  background: #444;
+  border-color: #777;
+  transform: translateY(-1px);
+}
+
+.selected-services-list {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+  border: 1px solid #333;
+}
+
+.selected-service-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+}
+
+.selected-service-item:last-child {
+  border-bottom: none;
+}
+
+.selected-service-item span:first-child {
+  color: white;
+  font-size: 15px;
+  flex: 1;
+}
+
+.selected-service-item span:nth-child(2) {
+  color: #4caf50;
+  font-weight: 600;
+  margin: 0 15px;
+  font-size: 15px;
+}
+
+.remove-service {
+  background: #444;
+  border: none;
+  color: #ccc;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.remove-service:hover {
+  background: #666;
+  color: white;
+}
+
+.services-total {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #333;
+  color: white;
+  font-size: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.services-total strong {
+  color: #4caf50;
+  font-size: 18px;
+}
+
+/* Кнопка подтверждения */
+.confirm {
+  width: 100%;
+  padding: 18px;
+  border-radius: 16px;
+  background: white;
+  color: black;
+  font-size: 17px;
+  border: none;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s;
-  margin-top: 10px;
+  transition: all 0.3s;
+  margin-top: 20px;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
 }
 
-.confirm-btn:hover:not(:disabled) {
-  background: #333;
+.confirm:hover:not(:disabled) {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
 }
 
-.confirm-btn.disabled {
-  background: #ccc;
+.confirm:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Модальное окно выбора услуг */
+.service-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.service-modal {
+  background: #111;
+  width: 100%;
+  max-height: 85vh;
+  border-radius: 25px 25px 0 0;
+  padding: 25px 20px;
+  color: white;
+  animation: slideUp 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.service-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #333;
+}
+
+.service-modal-header h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.close-modal {
+  background: #333;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.close-modal:hover {
+  background: #444;
+}
+
+.service-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 25px;
+  padding-right: 5px;
+  padding-bottom: 10px;
+}
+
+.service-modal-item {
+  padding: 18px;
+  background: #222;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  position: relative;
+}
+
+.service-modal-item:hover {
+  background: #2a2a2a;
+  transform: translateY(-2px);
+}
+
+.service-modal-item.selected {
+  background: #1a3a1a;
+  border-color: #4caf50;
+}
+
+.service-modal-name {
+  font-size: 16px;
+  color: white;
+  margin-bottom: 8px;
+  font-weight: 500;
+  padding-right: 30px;
+  line-height: 1.3;
+}
+
+.service-modal-price {
+  font-size: 16px;
+  color: #4caf50;
+  font-weight: 600;
+}
+
+.service-check {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  color: #4caf50;
+  font-weight: bold;
+  font-size: 20px;
+  background: rgba(76, 175, 80, 0.1);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-modal-footer {
+  padding-top: 20px;
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.modal-total {
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.modal-confirm {
+  padding: 14px 30px;
+  background: white;
+  color: black;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  min-width: 100px;
+}
+
+.modal-confirm:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
+}
+
+/* Адаптивность для мобильных */
+@media (max-height: 700px) {
+  .service-modal {
+    max-height: 80vh;
+  }
+
+  .service-modal-grid {
+    max-height: 50vh;
+  }
+}
+
+@media (min-width: 768px) {
+  .sheet-backdrop {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sheet {
+    max-width: 500px;
+    max-height: 80vh;
+    border-radius: 20px;
+    margin: auto;
+  }
+
+  .service-modal-backdrop {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .service-modal {
+    max-width: 600px;
+    max-height: 80vh;
+    border-radius: 20px;
+    margin: auto;
+  }
+
+  .service-modal-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Стили для скроллбаров */
+.sheet::-webkit-scrollbar,
+.service-modal-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sheet::-webkit-scrollbar-track,
+.service-modal-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sheet::-webkit-scrollbar-thumb,
+.service-modal-grid::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+.sheet::-webkit-scrollbar-thumb:hover,
+.service-modal-grid::-webkit-scrollbar-thumb:hover {
+  background: #777;
 }

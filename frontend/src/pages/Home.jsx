@@ -139,13 +139,13 @@ export default function Home() {
         onClose={() => setSelectedBarber(null)}
       />
 
-      {/* Скрытая кнопка для дебага */}
+      {/* Скрытая кнопка для дебага
       <div style={{ 
         
       }}>
         Hash: {window.location.hash}<br />
         Auth: {localStorage.getItem("barberAuthenticated") || 'false'}
-      </div>
+      </div> */}
     </>
   );
 }

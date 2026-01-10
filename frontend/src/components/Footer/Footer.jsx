@@ -34,8 +34,8 @@ export default function Footer() {
             <div className="footer-column">
               <h3>Контакти</h3>
               <div className="contact-info">
-                <p><span>📞</span> +38 095 054 5331</p>
-                <p><span>📍</span> м. Самар, вул. Центральна 123</p>
+                <p><span>📞</span> +38 095 054 53 31</p>
+                <p><span>📍</span> м. Самар, вул. Гетьманська 48</p>
               </div>
             </div>
             

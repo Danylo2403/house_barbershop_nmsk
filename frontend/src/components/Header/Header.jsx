@@ -82,13 +82,13 @@ export default function Header() {
               </div>
             </div>
             
-            <a 
+            {/* <a 
               href="#booking" 
               className="mobile-booking-button"
               onClick={() => setIsMenuOpen(false)}
             >
               Записатись
-            </a>
+            </a> */}
           </div>
         </div>
       </div>

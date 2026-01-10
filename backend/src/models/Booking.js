@@ -1,3 +1,4 @@
+// backend/models/Booking.js
 import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema(
@@ -19,6 +20,14 @@ const bookingSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    clientName: {
+      type: String,
+      required: true,
+      default: "Клієнт"
+    },
+    services: [{
+      type: String
+    }],
     notified: {
       type: Boolean,
       default: false
