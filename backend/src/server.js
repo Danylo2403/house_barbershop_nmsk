@@ -11,42 +11,35 @@ import bookingsRoutes from "./routes/bookings.routes.js";
 
 dotenv.config();
 
-/* 🔧 FIX __dirname for ES modules */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/* 🔥 Create app */
 const app = express();
 
-/* 🔥 Middlewares */
 app.use(cors());
 app.use(express.json());
 
-/* 🔥 Static barber images */
-app.use(
-  "/images",
-  express.static(path.join(__dirname, "../../frontend/public/images"))
-);
+/* 🔥 React build folder */
+const frontendPath = path.join(__dirname, "../../frontend/dist");
 
-/* 🔥 API routes */
+/* 🔥 Статика React */
+app.use(express.static(frontendPath));
+
+/* 🔥 Фото барберов */
+app.use("/images", express.static(path.join(frontendPath, "images")));
+
+/* API */
 app.use("/api/barbers", barbersRoutes);
 app.use("/api/bookings", bookingsRoutes);
 
-/* 🔥 React build path */
-const frontendPath = path.join(__dirname, "../../frontend/dist");
-
-/* 🔥 Serve React */
-app.use(express.static(frontendPath));
-
-/* 🔥 SPA fallback */
+/* 🔥 React router support */
 app.get("*", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
-/* ❗ Disable mongoose buffering */
+/* Mongo */
 mongoose.set("bufferCommands", false);
 
-/* 🔥 Start server */
 const PORT = process.env.PORT || 5000;
 
 mongoose
@@ -55,7 +48,7 @@ mongoose
     console.log("MongoDB connected");
     startCrons();
     app.listen(PORT, () => {
-      console.log("Server running on port", PORT);
+      console.log("Server running on port " + PORT);
     });
   })
   .catch(err => {
