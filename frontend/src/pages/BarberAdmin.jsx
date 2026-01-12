@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import "./BarberAdmin.css";
 
-// СЛОВНИК ПОСЛУГ (добавьте в начало)
+// СЛОВНИК ПОСЛУГ
 const SERVICE_NAMES = {
   haircut: "Стрижка",
   haircut_beard: "Стрижка + борода",
@@ -32,29 +32,56 @@ export default function BarberAdmin({ onLogout }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState(null); // НОВОЕ: выбранная запись
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   // Завантажити барберів
   useEffect(() => {
     fetch("/api/barbers")
       .then(res => res.json())
       .then(data => {
+        console.log("✅ Загружено барберов:", data.length);
         setBarbers(data);
-      });
+      })
+      .catch(err => console.error("❌ Ошибка загрузки барберов:", err));
   }, []);
 
-  // Завантажити записи на вибрану дату
+  // Завантажити записи на вибрану дату (ИСПРАВЛЕНО!)
   useEffect(() => {
     setLoading(true);
-    const dateStr = selectedDate.toISOString().split("T")[0];
+    
+    // Получаем локальную дату из selectedDate
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
+    console.log("====================================");
+    console.log("📅 Загружаю записи на дату:", dateStr);
+    console.log("📅 Выбранная дата (объект):", selectedDate.toString());
+    console.log("📅 Выбранная дата (форматированная):", formatDate(selectedDate));
     
     fetch(`/api/bookings/all?date=${dateStr}`)
-      .then(res => res.json())
+      .then(res => {
+        console.log("📡 Статус ответа API:", res.status);
+        return res.json();
+      })
       .then(data => {
+        console.log("✅ Получено записей:", data.length);
+        if (data.length > 0) {
+          console.log("📋 Пример записи:");
+          console.log("   Дата в базе:", data[0].date);
+          console.log("   Время в базе:", data[0].time);
+          console.log("   Барбер:", data[0].barber?.name);
+        } else {
+          console.log("📭 Записей на эту дату нет");
+        }
         setBookings(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(err => {
+        console.error("❌ Ошибка загрузки записей:", err);
+        setLoading(false);
+      });
   }, [selectedDate]);
 
   // Форматування дати
