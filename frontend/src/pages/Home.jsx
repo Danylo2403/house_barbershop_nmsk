@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Header from "../components/Header/Header";
 import Hero from "../components/Hero/Hero";
 import Barbers from "../components/Barbers/Barbers";
-import Gallery from "../components/Gallery/Gallery"; // Добавьте этот импорт
+import Gallery from "../components/Gallery/Gallery";
 import Footer from "../components/Footer/Footer";
 import BookingSheet from "../components/BookingSheet/BookingSheet";
 import BarberAdmin from "./BarberAdmin";
@@ -12,88 +12,67 @@ export default function Home() {
   const [barbers, setBarbers] = useState([]);
   const [selectedBarber, setSelectedBarber] = useState(null);
 
-  // Проверяем при каждом изменении URL
+  /* ================= ADMIN MODE ================= */
+
   useEffect(() => {
     const checkAdminAccess = () => {
       const hash = window.location.hash;
-      const isAuthenticated = localStorage.getItem("barberAuthenticated") === "true";
-      
-      console.log("🔍 Checking URL:", {
-        hash,
-        isAuthenticated,
-        fullURL: window.location.href
-      });
-      
+      const isAuthenticated =
+        localStorage.getItem("barberAuthenticated") === "true";
+
       if (hash === "#barber-admin" && isAuthenticated) {
-        console.log("✅ Showing admin panel");
         setShowAdmin(true);
       } else {
-        console.log("❌ Not showing admin");
         setShowAdmin(false);
       }
     };
 
-    // Проверяем сразу
     checkAdminAccess();
-    
-    // И слушаем изменения хэша
-    const handleHashChange = () => {
-      checkAdminAccess();
-    };
-    
-    window.addEventListener("hashchange", handleHashChange);
-    
-    return () => {
-      window.removeEventListener("hashchange", handleHashChange);
-    };
+    window.addEventListener("hashchange", checkAdminAccess);
+
+    return () => window.removeEventListener("hashchange", checkAdminAccess);
   }, []);
 
-  // Проверяем авторизацию каждую минуту
   useEffect(() => {
     const checkAuthExpiry = () => {
       const loginTime = localStorage.getItem("barberLoginTime");
-      if (loginTime) {
-        const loginDate = new Date(loginTime);
-        const now = new Date();
-        const hoursDiff = (now - loginDate) / (1000 * 60 * 60);
-        
-        if (hoursDiff > 24) {
-          localStorage.removeItem("barberAuthenticated");
-          localStorage.removeItem("barberLoginTime");
-          if (window.location.hash === "#barber-admin") {
-            window.location.hash = "";
-            window.location.reload();
-          }
-        }
+      if (!loginTime) return;
+
+      const hours =
+        (new Date() - new Date(loginTime)) / (1000 * 60 * 60);
+
+      if (hours > 24) {
+        localStorage.removeItem("barberAuthenticated");
+        localStorage.removeItem("barberLoginTime");
+        window.location.hash = "";
+        window.location.reload();
       }
     };
-    
+
     checkAuthExpiry();
-    const interval = setInterval(checkAuthExpiry, 60000); // Каждую минуту
-    
+    const interval = setInterval(checkAuthExpiry, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Загружаем барберов только для главной
+  /* ================= BARBERS LOAD ================= */
+
   useEffect(() => {
-    if (showAdmin) {
-      console.log("🚫 Skipping barber fetch - showing admin");
-      return;
-    }
-    
-    console.log("📡 Fetching barbers for main page");
+    if (showAdmin) return;
+
     fetch("/api/barbers")
       .then(res => res.json())
       .then(data => {
-        console.log("📥 BARBERS FROM API:", data);
+        console.log("📥 BARBERS:", data);
         setBarbers(data);
       })
-      .catch(err => console.error("❌ Fetch error:", err));
+      .catch(err => {
+        console.error("❌ API error:", err);
+      });
   }, [showAdmin]);
 
-  // Функция выхода из админки
+  /* ================= LOGOUT ================= */
+
   const handleLogout = () => {
-    console.log("🚪 Logging out from admin");
     localStorage.removeItem("barberAuthenticated");
     localStorage.removeItem("barberLoginTime");
     setShowAdmin(false);
@@ -101,23 +80,12 @@ export default function Home() {
     window.location.reload();
   };
 
-  // Добавим дебаг вывод
-  console.log("🏠 Home component render:", {
-    showAdmin,
-    barbersCount: barbers.length,
-    selectedBarber: selectedBarber?.name,
-    hash: window.location.hash,
-    auth: localStorage.getItem("barberAuthenticated")
-  });
+  /* ================= RENDER ================= */
 
-  // Если показываем админку
   if (showAdmin) {
-    console.log("🎯 Rendering BarberAdmin");
     return <BarberAdmin onLogout={handleLogout} />;
   }
 
-  // Иначе показываем обычную страницу
-  console.log("🎯 Rendering main page");
   return (
     <>
       <Header />
@@ -128,7 +96,6 @@ export default function Home() {
         onSelect={setSelectedBarber}
       />
 
-      {/* Добавьте компонент Gallery здесь */}
       <Gallery />
 
       <Footer />
@@ -138,6 +105,9 @@ export default function Home() {
         barber={selectedBarber}
         onClose={() => setSelectedBarber(null)}
       />
+    </>
+  );
+}
 
       {/* Скрытая кнопка для дебага
       <div style={{ 
@@ -146,6 +116,3 @@ export default function Home() {
         Hash: {window.location.hash}<br />
         Auth: {localStorage.getItem("barberAuthenticated") || 'false'}
       </div> */}
-    </>
-  );
-}
