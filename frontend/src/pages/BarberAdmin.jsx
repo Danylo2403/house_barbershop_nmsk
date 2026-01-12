@@ -36,7 +36,7 @@ export default function BarberAdmin({ onLogout }) {
 
   // Завантажити барберів
   useEffect(() => {
-    fetch("http://localhost:5000/api/barbers")
+    fetch(import.meta.env.VITE_API_URL + "/barbers")
       .then(res => res.json())
       .then(data => {
         setBarbers(data);
@@ -48,7 +48,7 @@ export default function BarberAdmin({ onLogout }) {
     setLoading(true);
     const dateStr = selectedDate.toISOString().split("T")[0];
     
-    fetch(`http://localhost:5000/api/bookings/all?date=${dateStr}`)
+    fetch(`${import.meta.env.VITE_API_URL}/bookings/all?date=${dateStr}`)
       .then(res => res.json())
       .then(data => {
         setBookings(data);

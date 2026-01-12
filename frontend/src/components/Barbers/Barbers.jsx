@@ -8,7 +8,7 @@ export default function Barbers() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/barbers")
+    fetch(import.meta.env.VITE_API_URL + "/barbers")
       .then((res) => res.json())
       .then((data) => {
         setBarbers(data);

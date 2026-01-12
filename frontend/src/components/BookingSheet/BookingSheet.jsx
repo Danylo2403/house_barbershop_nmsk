@@ -58,7 +58,7 @@ export default function BookingSheet({ open, onClose, barber }) {
   // 👉 завантажити зайняті слоти
   useEffect(() => {
     if (!open || !barber || !date) return;
-    fetch(`http://localhost:5000/api/bookings?barberId=${barber._id}&date=${date}`)
+    fetch(`${import.meta.env.VITE_API_URL}/bookings?barberId=${barber._id}&date=${date}`)
       .then(res => res.json())
       .then(data => setBusyTimes(data));
   }, [open, barber, date]);
@@ -85,7 +85,7 @@ export default function BookingSheet({ open, onClose, barber }) {
     setLoading(true);
     try {
       const startAt = new Date(`${date}T${time}:00`).toISOString();
-      const res = await fetch("http://localhost:5000/api/bookings", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

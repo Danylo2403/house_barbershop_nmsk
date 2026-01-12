@@ -82,7 +82,7 @@ export default function Home() {
     }
     
     console.log("📡 Fetching barbers for main page");
-    fetch("http://localhost:5000/api/barbers")
+    fetch("/api/barbers")
       .then(res => res.json())
       .then(data => {
         console.log("📥 BARBERS FROM API:", data);
