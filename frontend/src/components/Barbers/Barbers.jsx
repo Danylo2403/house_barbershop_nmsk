@@ -1,60 +1,28 @@
-import { useEffect, useState } from "react";
-import BookingSheet from "../BookingSheet/BookingSheet";
 import "./Barbers.css";
 
-export default function Barbers() {
-  const [barbers, setBarbers] = useState([]);
-  const [selected, setSelected] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch(import.meta.env.VITE_API_URL + "/barbers")
-      .then((res) => res.json())
-      .then((data) => {
-        setBarbers(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return <p style={{ textAlign: "center" }}>Завантаження барберів...</p>;
-  }
-
-  if (!barbers.length) {
+export default function Barbers({ barbers = [], onSelect }) {
+  console.log("Получил барберов:", barbers?.length || 0);
+  
+  if (!barbers || barbers.length === 0) {
     return <p style={{ textAlign: "center" }}>Барбери не завантажені</p>;
   }
 
   return (
-    <>
-      <section className="barbers">
-        {barbers.map((b) => (
-          <div className="barber-card" key={b._id}>
-            <img
-              src={b.photo}
-              alt={b.name}
-              className="barber-photo"
-              onError={(e) => {
-                e.target.src = "/images/placeholder.jpg";
-              }}
-            />
-            <h3>{b.name}</h3>
-            <p>{b.specialty}</p>
-            {/* <p>{b.experience} </p> */}
-            <button onClick={() => setSelected(b)}>
-              Записатись
-            </button>
-          </div>
-        ))}
-      </section>
-
-      {selected && (
-        <BookingSheet
-          open={true}
-          barber={selected}
-          onClose={() => setSelected(null)}
-        />
-      )}
-    </>
+    <section className="barbers">
+      {barbers.map((barber) => (
+        <div className="barber-card" key={barber._id}>
+          <img
+            src={barber.photo}
+            alt={barber.name}
+            className="barber-photo"
+          />
+          <h3>{barber.name}</h3>
+          <p>{barber.specialty}</p>
+          <button onClick={() => onSelect(barber)}>
+            Записатись
+          </button>
+        </div>
+      ))}
+    </section>
   );
 }
