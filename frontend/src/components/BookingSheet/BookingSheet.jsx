@@ -46,10 +46,21 @@ export default function BookingSheet({ open, onClose, barber }) {
   const [loading, setLoading] = useState(false);
   const [showServiceModal, setShowServiceModal] = useState(false);
 
-  // 👉 автоматично сьогодні
+  // 👉 автоматично сьогодні (ИСПРАВЛЕНО!)
   useEffect(() => {
     if (open && !date) {
-      setDate(new Date().toISOString().split("T")[0]);
+      // Получаем локальную дату, а не UTC
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const today = `${year}-${month}-${day}`;
+      
+      console.log("📅 Устанавливаю локальную дату:", today);
+      console.log("Локальное время сейчас:", now.toString());
+      console.log("UTC время сейчас:", now.toISOString());
+      
+      setDate(today);
       setClientName("");
       setSelectedServices([]);
     }
@@ -58,9 +69,20 @@ export default function BookingSheet({ open, onClose, barber }) {
   // 👉 завантажити зайняті слоти
   useEffect(() => {
     if (!open || !barber || !date) return;
+    
+    console.log("🔍 Загружаю занятые слоты:");
+    console.log("   Барбер ID:", barber._id);
+    console.log("   Дата:", date);
+    
     fetch(`/api/bookings?barberId=${barber._id}&date=${date}`)
       .then(res => res.json())
-      .then(data => setBusyTimes(data));
+      .then(data => {
+        console.log("✅ Занятые времена:", data);
+        setBusyTimes(data);
+      })
+      .catch(err => {
+        console.error("❌ Ошибка загрузки занятых слотов:", err);
+      });
   }, [open, barber, date]);
 
   if (!open || !barber) return null;
@@ -84,7 +106,15 @@ export default function BookingSheet({ open, onClose, barber }) {
   const submit = async () => {
     setLoading(true);
     try {
+      console.log("🚀 Отправляю запись на создание:");
+      console.log("   Дата:", date);
+      console.log("   Время:", time);
+      console.log("   Дата+Время для API:", `${date}T${time}:00`);
+      
       const startAt = new Date(`${date}T${time}:00`).toISOString();
+      
+      console.log("   startAt (ISO):", startAt);
+      
       const res = await fetch(`/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -100,6 +130,7 @@ export default function BookingSheet({ open, onClose, barber }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
+      console.log("✅ Запись создана успешно:", data);
       alert("Запис створено ✅");
       onClose();
       setTime("");
@@ -107,6 +138,7 @@ export default function BookingSheet({ open, onClose, barber }) {
       setClientName("");
       setSelectedServices([]);
     } catch (e) {
+      console.error("❌ Ошибка создания записи:", e);
       alert("Помилка: " + e.message);
     } finally {
       setLoading(false);

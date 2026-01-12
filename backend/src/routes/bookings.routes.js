@@ -50,26 +50,34 @@ router.get("/all", async (req, res) => {
 // ➕ Створити запис (ИСПРАВЛЕННАЯ ВЕРСИЯ)
 router.post("/", async (req, res) => {
   try {
-    console.log("📥 Дані:", req.body);
+    console.log("📥 Отримано дані для створення запису:");
+    console.log("   Повні дані:", req.body);
+    
     const { barberId, startAt, phone, clientName, services } = req.body;
 
     if (!barberId || !startAt || !phone) {
       return res.status(400).json({ error: "Заповніть всі поля" });
     }
 
-    // ✅ ИСПРАВЛЕНО: Добавляем 2 часа для Киева (UTC+2)
     const dateObj = new Date(startAt);
     
-    // Киев = UTC+2, добавляем 2 часа
+    console.log("🔄 Конвертація часу:");
+    console.log("   Отриманий startAt:", startAt);
+    console.log("   dateObj (локальний):", dateObj.toString());
+    console.log("   dateObj (UTC):", dateObj.toISOString());
+    
+    // ✅ ИСПРАВЛЕНО: Дата БЕЗ смещения (берем как есть)
+    const date = dateObj.toISOString().split("T")[0];
+    
+    // ✅ ИСПРАВЛЕНО: Время СО смещением для Киева (UTC+2)
     const kyivOffset = 2 * 60 * 60 * 1000; // 2 часа в миллисекундах
     const kyivDate = new Date(dateObj.getTime() + kyivOffset);
-    
-    const date = kyivDate.toISOString().split("T")[0];
     const time = kyivDate.toTimeString().slice(0, 5);
     
-    console.log(`🕐 Конвертація часу:`);
-    console.log(`   Отримано: ${startAt}`);
-    console.log(`   Київ: ${date} ${time}`);
+    console.log("📅 Результат конвертації:");
+    console.log("   Дата (без зсуву):", date);
+    console.log("   Час (UTC+2):", time);
+    console.log("   Повний час для БД:", `${date} ${time}`);
 
     const booking = await Booking.create({
       barber: barberId,
@@ -80,10 +88,19 @@ router.post("/", async (req, res) => {
       services: services || []
     });
 
-    console.log(`✅ Запис створено: ${date} ${time} для ${clientName || "клієнта"}`);
+    console.log(`✅ Запис успішно створено:`);
+    console.log(`   ID: ${booking._id}`);
+    console.log(`   Барбер: ${barberId}`);
+    console.log(`   Дата: ${date}`);
+    console.log(`   Час: ${time}`);
+    console.log(`   Клієнт: ${clientName || "Клієнт"}`);
+    console.log(`   Телефон: ${phone}`);
+    
     res.json(booking);
   } catch (err) {
-    console.error("❌ Помилка створення запису:", err);
+    console.error("❌ Помилка створення запису:");
+    console.error("   Повідомлення:", err.message);
+    console.error("   Стек:", err.stack);
     res.status(500).json({ error: err.message });
   }
 });
