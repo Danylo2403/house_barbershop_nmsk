@@ -47,7 +47,7 @@ router.get("/all", async (req, res) => {
   }
 });
 
-// ➕ Створити запис
+// ➕ Створити запис (ИСПРАВЛЕННАЯ ВЕРСИЯ)
 router.post("/", async (req, res) => {
   try {
     console.log("📥 Дані:", req.body);
@@ -57,9 +57,19 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Заповніть всі поля" });
     }
 
+    // ✅ ИСПРАВЛЕНО: Добавляем 2 часа для Киева (UTC+2)
     const dateObj = new Date(startAt);
-    const date = dateObj.toISOString().split("T")[0];
-    const time = dateObj.toTimeString().slice(0, 5);
+    
+    // Киев = UTC+2, добавляем 2 часа
+    const kyivOffset = 2 * 60 * 60 * 1000; // 2 часа в миллисекундах
+    const kyivDate = new Date(dateObj.getTime() + kyivOffset);
+    
+    const date = kyivDate.toISOString().split("T")[0];
+    const time = kyivDate.toTimeString().slice(0, 5);
+    
+    console.log(`🕐 Конвертація часу:`);
+    console.log(`   Отримано: ${startAt}`);
+    console.log(`   Київ: ${date} ${time}`);
 
     const booking = await Booking.create({
       barber: barberId,
@@ -70,6 +80,7 @@ router.post("/", async (req, res) => {
       services: services || []
     });
 
+    console.log(`✅ Запис створено: ${date} ${time} для ${clientName || "клієнта"}`);
     res.json(booking);
   } catch (err) {
     console.error("❌ Помилка створення запису:", err);
@@ -77,12 +88,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// Добавьте в backend/routes/bookings.routes.js после POST метода:
-
-/**
- * ❌ Скасувати запис (для барбера/адміна)
- * PUT /api/bookings/:id/cancel
- */
+// ❌ Скасувати запис (для барбера/адміна)
 router.put("/:id/cancel", async (req, res) => {
   try {
     const { id } = req.params;
@@ -111,10 +117,7 @@ router.put("/:id/cancel", async (req, res) => {
   }
 });
 
-/**
- * 🔄 Відновити запис
- * PUT /api/bookings/:id/restore
- */
+// 🔄 Відновити запис
 router.put("/:id/restore", async (req, res) => {
   try {
     const { id } = req.params;
@@ -142,10 +145,7 @@ router.put("/:id/restore", async (req, res) => {
   }
 });
 
-/**
- * 🗑️ Видалити запис повністю
- * DELETE /api/bookings/:id
- */
+// 🗑️ Видалити запис повністю
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
