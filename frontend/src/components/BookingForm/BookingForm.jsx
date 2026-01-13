@@ -64,8 +64,8 @@ export default function BookingForm({ barber, onSuccess }) {
 
   return (
     <div className="booking-form">
-      <h3>Запис до {barber.name}</h3>
-
+      <h3>Запис</h3>
+      {/* <h3>Запис до {barber.name}</h3> */}
       <BookingCalendar value={date} onChange={setDate} />
 
       <select value={time} onChange={e => setTime(e.target.value)}>

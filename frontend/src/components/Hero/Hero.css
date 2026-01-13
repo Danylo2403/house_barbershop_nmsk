@@ -23,8 +23,10 @@
 }
 
 .hero-content h1 {
-  font-size: 42px;
-  margin-bottom: 20px;
+  font-size: 36px;
+  margin-top: 225px;
+  /* font-size: 42px;
+  margin-bottom: 20px; */
 }
 
 .hero-btn {
