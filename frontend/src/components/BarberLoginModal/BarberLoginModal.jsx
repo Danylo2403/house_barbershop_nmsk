@@ -64,13 +64,13 @@ export default function BarberLoginModal({ open, onClose }) {
         </form>
         
         <div className="password-hint">
-          <p><strong>Паролі:</strong></p>
+          {/* <p><strong>Паролі:</strong></p>
           <ul>
             <li>Загальний: <code>barber123</code></li>
             <li>Сурен: <code>suren123</code></li>
             <li>Ануш: <code>anush123</code></li>
             <li>Кристіна: <code>kristina123</code></li>
-          </ul>
+          </ul> */}
         </div>
         
         <div className="modal-note">
