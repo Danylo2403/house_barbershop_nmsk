@@ -1,7 +1,6 @@
 // frontend/src/pages/BarberAdmin.jsx
 import { useEffect, useState } from "react";
 import "./BarberAdmin.css";
-import BookingForm from "../components/BookingForm/BookingForm"; // Импортируй форму
 
 // СЛОВНИК ПОСЛУГ
 const SERVICE_NAMES = {
@@ -34,9 +33,6 @@ export default function BarberAdmin({ onLogout }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [selectedBarber, setSelectedBarber] = useState(null);
-  const [selectedTime, setSelectedTime] = useState("");
 
   // Завантажити барберів
   useEffect(() => {
@@ -53,6 +49,7 @@ export default function BarberAdmin({ onLogout }) {
   useEffect(() => {
     setLoading(true);
     
+    // Получаем локальную дату из selectedDate
     const year = selectedDate.getFullYear();
     const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
     const day = String(selectedDate.getDate()).padStart(2, '0');
@@ -82,37 +79,12 @@ export default function BarberAdmin({ onLogout }) {
     });
   };
 
-  // Час з интервалом в 30 минут
+  // Часові слоти
   const timeSlots = [
-    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-    "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
-    "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00"
+    "09:00", "10:00", "11:00", "12:00", 
+    "13:00", "14:00", "15:00", "16:00", 
+    "17:00", "18:00"
   ];
-
-  // Длительность услуг (в минутах)
-  const SERVICE_DURATION = {
-    haircut: 60,
-    haircut_beard: 90,
-    machine_haircut: 45,
-    machine_haircut_beard: 75,
-    long_haircut: 90,
-    father_son: 120,
-    beard_design: 30,
-    father_two_sons: 150,
-    beard_grooming: 60,
-    haircut_shave: 90,
-    head_shave_beard: 90,
-    royal_shave: 120,
-    kids_under_10: 45,
-    teen_10_14: 60,
-    hair_styling: 30,
-    hair_trim: 20,
-    wax_one_zone: 15,
-    complex_styling: 60,
-    head_camouflage: 90,
-    beard_camouflage: 60,
-    head_peeling: 75
-  };
 
   // Знайти активну запис для барбера та часу
   const getActiveBooking = (barberId, time) => {
@@ -121,49 +93,6 @@ export default function BarberAdmin({ onLogout }) {
       b.time === time &&
       b.status === "active"
     );
-  };
-
-  // Проверить доступность времени (с учетом длительности)
-  const isTimeAvailable = (barberId, startTime, durationMinutes = 60) => {
-    const start = timeToMinutes(startTime);
-    const end = start + durationMinutes;
-    
-    // Получаем все записи барбера на эту дату
-    const barberBookings = bookings.filter(b => 
-      b.barber?._id === barberId && 
-      b.status === "active"
-    );
-    
-    for (const booking of barberBookings) {
-      const bookingStart = timeToMinutes(booking.time);
-      let bookingEnd = bookingStart + 60; // По умолчанию 60 минут
-      
-      // Если у записи есть услуги, берем самую долгую
-      if (booking.services && booking.services.length > 0) {
-        const maxDuration = Math.max(...booking.services.map(s => SERVICE_DURATION[s] || 60));
-        bookingEnd = bookingStart + maxDuration;
-      }
-      
-      // Проверяем пересечение интервалов
-      if (start < bookingEnd && bookingStart < end) {
-        return false;
-      }
-    }
-    
-    return true;
-  };
-
-  // Конвертировать время в минуты
-  const timeToMinutes = (timeStr) => {
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    return hours * 60 + minutes;
-  };
-
-  // Форматировать минуты в часы:минуты
-  const minutesToTime = (minutes) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
   };
 
   // Навігація по днях
@@ -221,15 +150,7 @@ export default function BarberAdmin({ onLogout }) {
     }, 0);
   };
 
-  // Получить длительность записи (в минутах)
-  const getBookingDuration = (services) => {
-    if (!services || services.length === 0) return 60;
-    
-    const maxDuration = Math.max(...services.map(s => SERVICE_DURATION[s] || 60));
-    return maxDuration;
-  };
-
-  // === ОБРАБОТЧИКИ ===
+  // === НОВІ ФУНКЦІЇ ===
 
   // Обробник кліку на клітинку календаря
   const handleCellClick = (barber, time) => {
@@ -243,39 +164,46 @@ export default function BarberAdmin({ onLogout }) {
         barberColor: barber.color
       });
     } else {
-      // Открыть форму для создания записи
-      setSelectedBarber(barber);
-      setSelectedTime(time);
-      setShowForm(true);
+      // Створити новий запис
+      createNewBooking(barber, time);
     }
   };
 
-  // Создание записи через форму
-  const createBooking = async (bookingData) => {
+  // Створити новий запис (барбером)
+  const createNewBooking = async (barber, time) => {
+    const clientName = prompt(`📝 Створити запис для ${barber.name} на ${time}\n\nВведіть ім'я клієнта:`);
+    if (!clientName || clientName.trim() === "") return;
+    
+    const phone = prompt("📞 Введіть номер телефону:");
+    if (!phone || phone.trim().length < 10) {
+      alert("❗ Будь ласка, введіть правильний номер телефону (10 цифр)");
+      return;
+    }
+
+    const servicesInput = prompt("💈 Введіть послуги через кому (необов'язково):");
+    const services = servicesInput 
+      ? servicesInput.split(',').map(s => s.trim()).filter(s => s)
+      : [];
+
     try {
       const year = selectedDate.getFullYear();
       const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
       const day = String(selectedDate.getDate()).padStart(2, '0');
       const date = `${year}-${month}-${day}`;
       
-      const startAt = new Date(`${date}T${selectedTime}:00`).toISOString();
+      const startAt = new Date(`${date}T${time}:00`).toISOString();
       
-      console.log("Создание записи:", { 
-        barberId: selectedBarber._id, 
-        date, 
-        time: selectedTime, 
-        ...bookingData 
-      });
+      console.log("Створення запису:", { barberId: barber._id, date, time, clientName, phone });
       
       const response = await fetch(`/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          barberId: selectedBarber._id,
+          barberId: barber._id,
           startAt,
-          phone: bookingData.phone.trim(),
-          clientName: bookingData.clientName.trim(),
-          services: bookingData.services || []
+          phone: phone.trim(),
+          clientName: clientName.trim(),
+          services
         })
       });
 
@@ -288,13 +216,7 @@ export default function BarberAdmin({ onLogout }) {
       
       // Оновити список записів
       setBookings(prev => [...prev, newBooking]);
-      
-      // Закрыть форму
-      setShowForm(false);
-      setSelectedBarber(null);
-      setSelectedTime("");
-      
-      alert(`✅ Запис створено!\n${selectedBarber.name} - ${selectedTime}\n${bookingData.clientName} - ${bookingData.phone}`);
+      alert(`✅ Запис створено!\n${barber.name} - ${time}\n${clientName} - ${phone}`);
       
     } catch (error) {
       console.error("Помилка створення запису:", error);
@@ -371,13 +293,6 @@ export default function BarberAdmin({ onLogout }) {
     setSelectedBooking(null);
   };
 
-  // Закрыть форму создания
-  const closeForm = () => {
-    setShowForm(false);
-    setSelectedBarber(null);
-    setSelectedTime("");
-  };
-
   return (
     <div className="barber-admin">
       {/* Шапка */}
@@ -433,19 +348,16 @@ export default function BarberAdmin({ onLogout }) {
                 
                 {barbers.map(barber => {
                   const booking = getActiveBooking(barber._id, time);
-                  const isAvailable = !booking;
                   
                   return (
                     <div
                       key={`${barber._id}-${time}`}
-                      className={`booking-cell ${booking ? "booked" : "free"} ${!isAvailable ? "unavailable" : ""}`}
+                      className={`booking-cell ${booking ? "booked" : "free"}`}
                       style={{
                         backgroundColor: booking ? barber.color : "transparent",
-                        borderColor: barber.color,
-                        opacity: !isAvailable ? 0.7 : 1
+                        borderColor: barber.color
                       }}
-                      onClick={() => isAvailable && handleCellClick(barber, time)}
-                      title={!isAvailable ? "Цей час вже зайнятий" : `Клікніть щоб створити запис на ${time}`}
+                      onClick={() => handleCellClick(barber, time)}
                     >
                       {booking ? (
                         <div className="booking-info">
@@ -453,7 +365,7 @@ export default function BarberAdmin({ onLogout }) {
                           <div className="client-phone">{booking.phone}</div>
                           {booking.services && booking.services.length > 0 && (
                             <div className="service-indicator">
-                              💈 {booking.services.length} • {getBookingDuration(booking.services)}хв
+                              💈 {booking.services.length}
                             </div>
                           )}
                         </div>
@@ -483,8 +395,8 @@ export default function BarberAdmin({ onLogout }) {
             </div>
           ))}
           <div className="legend-item">
-            <div className="color-box free">+</div>
-            <span>Вільно (клікніть щоб створити)</span>
+            <div className="color-box free">—</div>
+            <span>Вільно</span>
           </div>
           <div className="legend-item">
             <div className="color-box indicator">💈</div>
@@ -517,38 +429,6 @@ export default function BarberAdmin({ onLogout }) {
           </div>
         </div>
       </footer>
-
-      {/* Форма создания записи */}
-      {showForm && selectedBarber && (
-        <div className="form-modal-overlay" onClick={closeForm}>
-          <div className="form-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="form-modal-header">
-              <h2>Створити запис</h2>
-              <button className="form-modal-close" onClick={closeForm}>
-                ×
-              </button>
-            </div>
-            
-            <div className="form-modal-body">
-              <div className="form-info">
-                <p><strong>Барбер:</strong> {selectedBarber.name}</p>
-                <p><strong>Дата:</strong> {formatDate(selectedDate)}</p>
-                <p><strong>Час:</strong> {selectedTime}</p>
-              </div>
-              
-              <BookingForm 
-                barber={selectedBarber}
-                defaultTime={selectedTime}
-                defaultDate={`${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`}
-                onSuccess={(bookingData) => {
-                  createBooking(bookingData);
-                }}
-                onCancel={closeForm}
-              />
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Модальне вікно деталей запису */}
       {selectedBooking && (
@@ -594,14 +474,6 @@ export default function BarberAdmin({ onLogout }) {
                 <div className="detail-value time">{selectedBooking.time}</div>
               </div>
               
-              {/* Длительность */}
-              <div className="detail-row">
-                <div className="detail-label">Тривалість:</div>
-                <div className="detail-value">
-                  {getBookingDuration(selectedBooking.services)} хвилин
-                </div>
-              </div>
-              
               {/* Клієнт */}
               <div className="detail-section">
                 <h3>👤 Клієнт</h3>
@@ -624,9 +496,6 @@ export default function BarberAdmin({ onLogout }) {
                       {selectedBooking.services.map((serviceId, index) => (
                         <div key={index} className="service-item">
                           <div className="service-name">{getServiceName(serviceId)}</div>
-                          <div className="service-duration">
-                            {SERVICE_DURATION[serviceId] || 60} хв
-                          </div>
                         </div>
                       ))}
                     </div>
