@@ -884,3 +884,257 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ......... */
+/* Стили для формы создания */
+.form-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.form-modal-content {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+}
+
+.form-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 30px 20px;
+  border-bottom: 1px solid #eee;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.form-modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.form-modal-close {
+  background: #f8f9fa;
+  border: none;
+  font-size: 28px;
+  color: #666;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.form-modal-close:hover {
+  background: #e9ecef;
+  color: #333;
+  transform: rotate(90deg);
+}
+
+.form-modal-body {
+  padding: 25px 30px;
+}
+
+.form-info {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 25px;
+  border-left: 4px solid #007bff;
+}
+
+.form-info p {
+  margin: 8px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.form-info strong {
+  color: #555;
+  min-width: 60px;
+  display: inline-block;
+}
+
+/* Продолжительность в деталях записи */
+.service-duration {
+  font-size: 13px;
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: 3px 8px;
+  border-radius: 12px;
+  margin-left: 10px;
+}
+
+/* Недоступные ячейки */
+.booking-cell.unavailable {
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+
+.booking-cell.unavailable:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Подсказка о длительности в календаре */
+.booking-cell .service-indicator {
+  font-size: 10px;
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  margin-top: 3px;
+  display: inline-block;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .form-modal-content {
+    max-width: 95%;
+    max-height: 85vh;
+  }
+
+  .form-modal-header {
+    padding: 20px;
+  }
+
+  .form-modal-header h2 {
+    font-size: 20px;
+  }
+
+  .form-modal-body {
+    padding: 20px;
+  }
+
+  .form-info {
+    padding: 15px;
+  }
+
+  .form-info p {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-modal-content {
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    margin-top: auto;
+  }
+
+  .form-modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .form-modal-header {
+    padding: 15px;
+  }
+
+  .form-modal-body {
+    padding: 15px;
+  }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Секция для ручного ввода времени */
+.custom-time-section {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  margin: 15px 0;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-time-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.custom-time-btn:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.time-help {
+  margin-top: 10px;
+  color: #666;
+}
+
+/* Поле ввода времени в форме */
+.time-input {
+  margin-left: 10px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  width: 100px;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Показать время в свободных ячейках */
+.booking-cell .free-text {
+  color: #333;
+  font-weight: 500;
+  font-size: 13px;
+}
