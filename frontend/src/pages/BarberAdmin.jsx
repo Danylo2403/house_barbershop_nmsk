@@ -1,7 +1,7 @@
 // frontend/src/pages/BarberAdmin.jsx
 import { useEffect, useState } from "react";
 import "./BarberAdmin.css";
-import BookingForm from "../components/BookingForm/BookingForm";
+import BookingForm from "../components/BookingForm/BookingForm"; // Импортируй форму
 
 // СЛОВНИК ПОСЛУГ
 const SERVICE_NAMES = {
@@ -82,16 +82,12 @@ export default function BarberAdmin({ onLogout }) {
     });
   };
 
-  // Час з интервалом в 15 минут (простой вариант)
-  const timeSlots = [];
-  for (let hour = 9; hour <= 18; hour++) {
-    for (let minute = 0; minute < 60; minute += 15) {
-      if (hour === 18 && minute > 0) break; // Только 18:00
-      timeSlots.push(
-        `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
-      );
-    }
-  }
+  // Час з интервалом в 30 минут
+  const timeSlots = [
+    "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+    "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
+    "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00"
+  ];
 
   // Длительность услуг (в минутах)
   const SERVICE_DURATION = {
@@ -118,25 +114,56 @@ export default function BarberAdmin({ onLogout }) {
     head_peeling: 75
   };
 
-  // Знайти запис для барбера та часу
-  const getBookingForSlot = (barberId, time) => {
-    const booking = bookings.find(b => 
+  // Знайти активну запис для барбера та часу
+  const getActiveBooking = (barberId, time) => {
+    return bookings.find(b => 
       b.barber?._id === barberId && 
       b.time === time &&
       b.status === "active"
     );
-    
-    if (booking) return booking;
-    
-    // Если нет точного совпадения, ищем записи, которые могут занимать этот слот
-    // (упрощенная проверка - только по начальному времени)
-    return null;
   };
 
-  // Проверяем, свободен ли слот
-  const isSlotFree = (barberId, time) => {
-    const booking = getBookingForSlot(barberId, time);
-    return !booking;
+  // Проверить доступность времени (с учетом длительности)
+  const isTimeAvailable = (barberId, startTime, durationMinutes = 60) => {
+    const start = timeToMinutes(startTime);
+    const end = start + durationMinutes;
+    
+    // Получаем все записи барбера на эту дату
+    const barberBookings = bookings.filter(b => 
+      b.barber?._id === barberId && 
+      b.status === "active"
+    );
+    
+    for (const booking of barberBookings) {
+      const bookingStart = timeToMinutes(booking.time);
+      let bookingEnd = bookingStart + 60; // По умолчанию 60 минут
+      
+      // Если у записи есть услуги, берем самую долгую
+      if (booking.services && booking.services.length > 0) {
+        const maxDuration = Math.max(...booking.services.map(s => SERVICE_DURATION[s] || 60));
+        bookingEnd = bookingStart + maxDuration;
+      }
+      
+      // Проверяем пересечение интервалов
+      if (start < bookingEnd && bookingStart < end) {
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
+  // Конвертировать время в минуты
+  const timeToMinutes = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
+  // Форматировать минуты в часы:минуты
+  const minutesToTime = (minutes) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
   };
 
   // Навігація по днях
@@ -206,7 +233,7 @@ export default function BarberAdmin({ onLogout }) {
 
   // Обробник кліку на клітинку календаря
   const handleCellClick = (barber, time) => {
-    const booking = getBookingForSlot(barber._id, time);
+    const booking = getActiveBooking(barber._id, time);
     
     if (booking) {
       // Відкрити деталі існуючого запису
@@ -405,19 +432,20 @@ export default function BarberAdmin({ onLogout }) {
                 <div className="time-cell">{time}</div>
                 
                 {barbers.map(barber => {
-                  const booking = getBookingForSlot(barber._id, time);
-                  const isFree = !booking;
+                  const booking = getActiveBooking(barber._id, time);
+                  const isAvailable = !booking;
                   
                   return (
                     <div
                       key={`${barber._id}-${time}`}
-                      className={`booking-cell ${isFree ? "free" : "booked"}`}
+                      className={`booking-cell ${booking ? "booked" : "free"} ${!isAvailable ? "unavailable" : ""}`}
                       style={{
                         backgroundColor: booking ? barber.color : "transparent",
-                        borderColor: barber.color
+                        borderColor: barber.color,
+                        opacity: !isAvailable ? 0.7 : 1
                       }}
-                      onClick={() => handleCellClick(barber, time)}
-                      title={booking ? `Запис: ${booking.clientName}` : `Клікніть щоб створити запис на ${time}`}
+                      onClick={() => isAvailable && handleCellClick(barber, time)}
+                      title={!isAvailable ? "Цей час вже зайнятий" : `Клікніть щоб створити запис на ${time}`}
                     >
                       {booking ? (
                         <div className="booking-info">
@@ -425,7 +453,7 @@ export default function BarberAdmin({ onLogout }) {
                           <div className="client-phone">{booking.phone}</div>
                           {booking.services && booking.services.length > 0 && (
                             <div className="service-indicator">
-                              💈 {getBookingDuration(booking.services)}хв
+                              💈 {booking.services.length} • {getBookingDuration(booking.services)}хв
                             </div>
                           )}
                         </div>
@@ -460,7 +488,7 @@ export default function BarberAdmin({ onLogout }) {
           </div>
           <div className="legend-item">
             <div className="color-box indicator">💈</div>
-            <span>Показує тривалість послуг</span>
+            <span>Є послуги</span>
           </div>
         </div>
       </div>
@@ -479,8 +507,13 @@ export default function BarberAdmin({ onLogout }) {
             <div className="stat-label">Барберів</div>
           </div>
           <div className="stat-item">
-            <div className="stat-number">{timeSlots.length}</div>
-            <div className="stat-label">Слотів</div>
+            <div className="stat-number">
+              {new Date().toLocaleTimeString('uk-UA', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+              })}
+            </div>
+            <div className="stat-label">Час</div>
           </div>
         </div>
       </footer>
