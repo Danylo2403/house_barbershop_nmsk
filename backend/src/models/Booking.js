@@ -28,6 +28,20 @@ const bookingSchema = new mongoose.Schema(
     services: [{
       type: String
     }],
+    status: {
+      type: String,
+      enum: ["active", "cancelled"],
+      default: "active"
+    },
+    cancelledBy: {
+      type: String,
+      enum: ["client", "barber"],
+      default: null
+    },
+    cancellationReason: {
+      type: String,
+      default: ""
+    },
     notified: {
       type: Boolean,
       default: false

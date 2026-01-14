@@ -45,7 +45,7 @@ export default function BarberAdmin({ onLogout }) {
       .catch(err => console.error("❌ Ошибка загрузки барберов:", err));
   }, []);
 
-  // Завантажити записи на вибрану дату (ИСПРАВЛЕНО!)
+  // Завантажити записи на вибрану дату
   useEffect(() => {
     setLoading(true);
     
@@ -55,26 +55,12 @@ export default function BarberAdmin({ onLogout }) {
     const day = String(selectedDate.getDate()).padStart(2, '0');
     const dateStr = `${year}-${month}-${day}`;
     
-    console.log("====================================");
     console.log("📅 Загружаю записи на дату:", dateStr);
-    console.log("📅 Выбранная дата (объект):", selectedDate.toString());
-    console.log("📅 Выбранная дата (форматированная):", formatDate(selectedDate));
     
     fetch(`/api/bookings/all?date=${dateStr}`)
-      .then(res => {
-        console.log("📡 Статус ответа API:", res.status);
-        return res.json();
-      })
+      .then(res => res.json())
       .then(data => {
         console.log("✅ Получено записей:", data.length);
-        if (data.length > 0) {
-          console.log("📋 Пример записи:");
-          console.log("   Дата в базе:", data[0].date);
-          console.log("   Время в базе:", data[0].time);
-          console.log("   Барбер:", data[0].barber?.name);
-        } else {
-          console.log("📭 Записей на эту дату нет");
-        }
         setBookings(data);
         setLoading(false);
       })
@@ -93,18 +79,19 @@ export default function BarberAdmin({ onLogout }) {
     });
   };
 
-  // Часові слоти (з 9:00 до 18:00)
+  // Часові слоти
   const timeSlots = [
     "09:00", "10:00", "11:00", "12:00", 
     "13:00", "14:00", "15:00", "16:00", 
     "17:00", "18:00"
   ];
 
-  // Знайти запис для барбера та часу
-  const getBooking = (barberId, time) => {
+  // Знайти активну запис для барбера та часу
+  const getActiveBooking = (barberId, time) => {
     return bookings.find(b => 
       b.barber?._id === barberId && 
-      b.time === time
+      b.time === time &&
+      b.status === "active"
     );
   };
 
@@ -128,22 +115,6 @@ export default function BarberAdmin({ onLogout }) {
   // Функція для отримання назви послуги
   const getServiceName = (serviceId) => {
     return SERVICE_NAMES[serviceId] || serviceId;
-  };
-
-  // Обробник кліку на запис
-  const handleBookingClick = (booking, barber) => {
-    if (booking) {
-      setSelectedBooking({
-        ...booking,
-        barberName: barber.name,
-        barberColor: barber.color
-      });
-    }
-  };
-
-  // Закрити модальне вікно
-  const closeModal = () => {
-    setSelectedBooking(null);
   };
 
   // Отримати загальну суму для запису
@@ -179,12 +150,155 @@ export default function BarberAdmin({ onLogout }) {
     }, 0);
   };
 
+  // === НОВІ ФУНКЦІЇ ===
+
+  // Обробник кліку на клітинку календаря
+  const handleCellClick = (barber, time) => {
+    const booking = getActiveBooking(barber._id, time);
+    
+    if (booking) {
+      // Відкрити деталі існуючого запису
+      setSelectedBooking({
+        ...booking,
+        barberName: barber.name,
+        barberColor: barber.color
+      });
+    } else {
+      // Створити новий запис
+      createNewBooking(barber, time);
+    }
+  };
+
+  // Створити новий запис (барбером)
+  const createNewBooking = async (barber, time) => {
+    const clientName = prompt(`📝 Створити запис для ${barber.name} на ${time}\n\nВведіть ім'я клієнта:`);
+    if (!clientName || clientName.trim() === "") return;
+    
+    const phone = prompt("📞 Введіть номер телефону:");
+    if (!phone || phone.trim().length < 10) {
+      alert("❗ Будь ласка, введіть правильний номер телефону (10 цифр)");
+      return;
+    }
+
+    const servicesInput = prompt("💈 Введіть послуги через кому (необов'язково):");
+    const services = servicesInput 
+      ? servicesInput.split(',').map(s => s.trim()).filter(s => s)
+      : [];
+
+    try {
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const date = `${year}-${month}-${day}`;
+      
+      const startAt = new Date(`${date}T${time}:00`).toISOString();
+      
+      console.log("Створення запису:", { barberId: barber._id, date, time, clientName, phone });
+      
+      const response = await fetch(`/api/bookings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          barberId: barber._id,
+          startAt,
+          phone: phone.trim(),
+          clientName: clientName.trim(),
+          services
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Помилка створення запису");
+      }
+      
+      const newBooking = await response.json();
+      
+      // Оновити список записів
+      setBookings(prev => [...prev, newBooking]);
+      alert(`✅ Запис створено!\n${barber.name} - ${time}\n${clientName} - ${phone}`);
+      
+    } catch (error) {
+      console.error("Помилка створення запису:", error);
+      alert(`❌ Помилка: ${error.message}`);
+    }
+  };
+
+  // Скасувати запис
+  const cancelBooking = async (bookingId) => {
+    if (!confirm("Ви впевнені, що хочете скасувати цей запис?")) return;
+    
+    try {
+      const response = await fetch(`/api/bookings/${bookingId}/cancel`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          reason: "Скасовано барбером" 
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Помилка скасування");
+      }
+      
+      const cancelledBooking = await response.json();
+      
+      // Оновити запис в списку
+      setBookings(prev => prev.map(b => 
+        b._id === bookingId ? cancelledBooking : b
+      ));
+      
+      // Закрити модальне вікно
+      closeModal();
+      
+      alert("✅ Запис скасовано");
+      
+    } catch (error) {
+      console.error("Помилка скасування:", error);
+      alert(`❌ Помилка: ${error.message}`);
+    }
+  };
+
+  // Видалити запис назавжди
+  const deleteBooking = async (bookingId) => {
+    if (!confirm("⚠️ УВАГА!\n\nВидалити запис назавжди?\nЦю дію не можна скасувати.")) return;
+    
+    try {
+      const response = await fetch(`/api/bookings/${bookingId}`, {
+        method: "DELETE"
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Помилка видалення");
+      }
+      
+      // Видалити запис зі списку
+      setBookings(prev => prev.filter(b => b._id !== bookingId));
+      
+      // Закрити модальне вікно
+      closeModal();
+      
+      alert("🗑️ Запис видалено назавжди");
+      
+    } catch (error) {
+      console.error("Помилка видалення:", error);
+      alert(`❌ Помилка: ${error.message}`);
+    }
+  };
+
+  // Закрити модальне вікно
+  const closeModal = () => {
+    setSelectedBooking(null);
+  };
+
   return (
     <div className="barber-admin">
       {/* Шапка */}
       <header className="admin-header">
         <div className="header-left">
-          <h1>📅 Загальний календар</h1>
+          <h1>📅 Адмін-панель барбера</h1>
           <button className="logout-btn" onClick={onLogout}>
             ← Вийти
           </button>
@@ -233,7 +347,7 @@ export default function BarberAdmin({ onLogout }) {
                 <div className="time-cell">{time}</div>
                 
                 {barbers.map(barber => {
-                  const booking = getBooking(barber._id, time);
+                  const booking = getActiveBooking(barber._id, time);
                   
                   return (
                     <div
@@ -243,7 +357,7 @@ export default function BarberAdmin({ onLogout }) {
                         backgroundColor: booking ? barber.color : "transparent",
                         borderColor: barber.color
                       }}
-                      onClick={() => handleBookingClick(booking, barber)}
+                      onClick={() => handleCellClick(barber, time)}
                     >
                       {booking ? (
                         <div className="booking-info">
@@ -256,7 +370,7 @@ export default function BarberAdmin({ onLogout }) {
                           )}
                         </div>
                       ) : (
-                        <span className="free-text">—</span>
+                        <span className="free-text">+</span>
                       )}
                     </div>
                   );
@@ -295,8 +409,10 @@ export default function BarberAdmin({ onLogout }) {
       <footer className="stats-footer">
         <div className="stats">
           <div className="stat-item">
-            <div className="stat-number">{bookings.length}</div>
-            <div className="stat-label">Всього записів</div>
+            <div className="stat-number">
+              {bookings.filter(b => b.status === "active").length}
+            </div>
+            <div className="stat-label">Активних записів</div>
           </div>
           <div className="stat-item">
             <div className="stat-number">{barbers.length}</div>
@@ -326,6 +442,14 @@ export default function BarberAdmin({ onLogout }) {
             </div>
             
             <div className="modal-body">
+              {/* Статус */}
+              <div className="detail-row">
+                <div className="detail-label">Статус:</div>
+                <div className={`detail-value ${selectedBooking.status === "cancelled" ? "status-cancelled" : "status-active"}`}>
+                  {selectedBooking.status === "active" ? "✅ Активний" : "❌ Скасовано"}
+                </div>
+              </div>
+              
               {/* Барбер */}
               <div className="detail-row">
                 <div className="detail-label">Барбер:</div>
@@ -397,6 +521,14 @@ export default function BarberAdmin({ onLogout }) {
                     {new Date(selectedBooking.createdAt).toLocaleString('uk-UA')}
                   </div>
                 </div>
+                {selectedBooking.status === "cancelled" && (
+                  <div className="detail-row">
+                    <div className="detail-label">Скасовано:</div>
+                    <div className="detail-value">
+                      {new Date(selectedBooking.updatedAt).toLocaleString('uk-UA')}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -404,6 +536,23 @@ export default function BarberAdmin({ onLogout }) {
               <button className="modal-btn close-btn" onClick={closeModal}>
                 Закрити
               </button>
+              
+              {selectedBooking.status === "active" ? (
+                <button 
+                  className="modal-btn cancel-btn"
+                  onClick={() => cancelBooking(selectedBooking._id)}
+                >
+                  ❌ Скасувати
+                </button>
+              ) : (
+                <button 
+                  className="modal-btn delete-btn"
+                  onClick={() => deleteBooking(selectedBooking._id)}
+                >
+                  🗑️ Видалити
+                </button>
+              )}
+              
               <button 
                 className="modal-btn call-btn"
                 onClick={() => window.open(`tel:${selectedBooking.phone}`)}

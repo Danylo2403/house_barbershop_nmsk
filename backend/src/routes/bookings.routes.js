@@ -4,7 +4,7 @@ import Booking from "../models/Booking.js";
 
 const router = express.Router();
 
-// 🔎 Отримати зайняті години
+// 🔎 Отримати зайняті години (ТОЛЬКО АКТИВНІ ЗАПИСИ)
 router.get("/", async (req, res) => {
   try {
     const { barberId, date } = req.query;
@@ -15,6 +15,7 @@ router.get("/", async (req, res) => {
     const bookings = await Booking.find({
       barber: barberId,
       date: date,
+      status: "active"  // ← ТОЛЬКО АКТИВНІ!
     }).select("time");
 
     const busyTimes = bookings.map(b => b.time);
@@ -25,7 +26,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// 🔎 Отримати всі записи всіх барберів на дату (для загального календаря)
+// 🔎 Отримати всі записи всіх барберів на дату (ТОЛЬКО АКТИВНІ)
 router.get("/all", async (req, res) => {
   try {
     const { date } = req.query;
@@ -36,6 +37,7 @@ router.get("/all", async (req, res) => {
 
     const bookings = await Booking.find({
       date: date,
+      status: "active"  // ← ТОЛЬКО АКТИВНІ!
     })
     .populate('barber', 'name color')
     .sort({ time: 1 });
@@ -47,7 +49,7 @@ router.get("/all", async (req, res) => {
   }
 });
 
-// ➕ Створити запис (ИСПРАВЛЕННАЯ ВЕРСИЯ)
+// ➕ Створити запис
 router.post("/", async (req, res) => {
   try {
     console.log("📥 Отримано дані для створення запису:");
@@ -66,18 +68,17 @@ router.post("/", async (req, res) => {
     console.log("   dateObj (локальний):", dateObj.toString());
     console.log("   dateObj (UTC):", dateObj.toISOString());
     
-    // ✅ ИСПРАВЛЕНО: Дата БЕЗ смещения (берем как есть)
+    // Дата БЕЗ смещения
     const date = dateObj.toISOString().split("T")[0];
     
-    // ✅ ИСПРАВЛЕНО: Время СО смещением для Киева (UTC+2)
-    const kyivOffset = 2 * 60 * 60 * 1000; // 2 часа в миллисекундах
+    // Время СО смещением для Киева (UTC+2)
+    const kyivOffset = 2 * 60 * 60 * 1000;
     const kyivDate = new Date(dateObj.getTime() + kyivOffset);
     const time = kyivDate.toTimeString().slice(0, 5);
     
     console.log("📅 Результат конвертації:");
     console.log("   Дата (без зсуву):", date);
     console.log("   Час (UTC+2):", time);
-    console.log("   Повний час для БД:", `${date} ${time}`);
 
     const booking = await Booking.create({
       barber: barberId,
@@ -85,7 +86,10 @@ router.post("/", async (req, res) => {
       time,
       phone,
       clientName: clientName || "Клієнт",
-      services: services || []
+      services: services || [],
+      status: "active",  // ← ЗАВЖДИ АКТИВНИЙ ПРИ СОЗДАНИИ
+      cancelledBy: null,
+      cancellationReason: ""
     });
 
     console.log(`✅ Запис успішно створено:`);
@@ -134,35 +138,7 @@ router.put("/:id/cancel", async (req, res) => {
   }
 });
 
-// 🔄 Відновити запис
-router.put("/:id/restore", async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    const booking = await Booking.findByIdAndUpdate(
-      id,
-      {
-        status: "active",
-        cancelledBy: null,
-        cancellationReason: ""
-      },
-      { new: true }
-    ).populate('barber', 'name color');
-
-    if (!booking) {
-      return res.status(404).json({ error: "Запис не знайдено" });
-    }
-
-    console.log(`✅ Запис відновлено: ${booking.clientName} (${booking.date} ${booking.time})`);
-    res.json(booking);
-    
-  } catch (err) {
-    console.error("❌ Помилка відновлення запису:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// 🗑️ Видалити запис повністю
+// 🗑️ Видалити запис повністю (НАВСЕГДИ)
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
