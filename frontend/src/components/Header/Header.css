@@ -5,7 +5,7 @@
   top: 0;
   z-index: 1000;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
-  border-bottom: 2px solid #d4af37;
+  border-bottom: 2px solid #ffd700;
 }
 
 .header-container {
@@ -46,7 +46,7 @@
 .logo-subtitle {
   font-size: 20px;
   font-weight: 600;
-  color: #d4af37;
+  color: #ffd700;
   letter-spacing: 0.5px;
 }
 
@@ -66,7 +66,7 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: #d4af37;
+  background: #ffd700;
   color: #000;
   border-radius: 50%;
   text-decoration: none;
@@ -77,7 +77,7 @@
 }
 
 .mobile-phone:hover {
-  background: #b8941f;
+  background: #ffd700;
   transform: scale(1.1);
 }
 
@@ -176,7 +176,7 @@
 }
 
 .mobile-nav-link:hover {
-  color: #d4af37;
+  color: #ffd700;
   padding-left: 10px;
 }
 
@@ -229,7 +229,7 @@
 
 .mobile-booking-button {
   display: block;
-  background: #d4af37;
+  background: #ffd700;
   color: #000;
   text-decoration: none;
   text-align: center;
@@ -242,7 +242,7 @@
 }
 
 .mobile-booking-button:hover {
-  background: #b8941f;
+  background: #ffd700;
 }
 
 /* ===== ДЕСКТОПНАЯ ВЕРСИЯ (768px и выше) ===== */
@@ -286,7 +286,7 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    color: #d4af37;
+    color: #ffd700;
     text-decoration: none;
     font-size: 20px;
     font-weight: 600;

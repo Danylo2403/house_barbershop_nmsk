@@ -162,7 +162,8 @@ export default function BookingSheet({ open, onClose, barber }) {
           exit={{ y: "100%" }}
         >
           <div className="sheet-handle" />
-          <h2>Запис до {barber.name}</h2>
+          <h2>Запис</h2>
+          {/* <h2>Запис до {barber.name}</h2> */}
 
           <BookingCalendar value={date} onChange={setDate} />
 
