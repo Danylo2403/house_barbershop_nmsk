@@ -189,7 +189,8 @@
 .booking-cell.free {
   background: #f8f9fa;
   border-color: #dee2e6;
-  border-style: dashed;
+  /* border-style: dashed; */
+  border-style: solid;
 }
 
 .booking-info {
@@ -274,7 +275,8 @@
 
 .color-box.free {
   background: white;
-  border: 2px dashed #dee2e6;
+  /* border: 2px dashed #dee2e6; */
+  border: 2px solid #dee2e6;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,5 +1,5 @@
 // frontend/src/pages/BarberAdmin.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./BarberAdmin.css";
 
 // СЛОВНИК ПОСЛУГ
@@ -33,6 +33,8 @@ export default function BarberAdmin({ onLogout }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const datePickerRef = useRef(null);
 
   // Завантажити барберів
   useEffect(() => {
@@ -70,6 +72,20 @@ export default function BarberAdmin({ onLogout }) {
       });
   }, [selectedDate]);
 
+  // Закрытие datepicker при клике вне его
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (datePickerRef.current && !datePickerRef.current.contains(event.target)) {
+        setShowDatePicker(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   // Форматування дати
   const formatDate = (date) => {
     return date.toLocaleDateString('uk-UA', {
@@ -79,11 +95,11 @@ export default function BarberAdmin({ onLogout }) {
     });
   };
 
-  // Часові слоти
+  // Часові слоти (добавлено 19:00)
   const timeSlots = [
     "09:00", "10:00", "11:00", "12:00", 
     "13:00", "14:00", "15:00", "16:00", 
-    "17:00", "18:00"
+    "17:00", "18:00", "19:00"
   ];
 
   // Знайти активну запис для барбера та часу
@@ -110,6 +126,21 @@ export default function BarberAdmin({ onLogout }) {
 
   const goToToday = () => {
     setSelectedDate(new Date());
+  };
+
+  // Обработчик выбора даты из календаря
+  const handleDateChange = (e) => {
+    const newDate = new Date(e.target.value);
+    setSelectedDate(newDate);
+    setShowDatePicker(false);
+  };
+
+  // Форматирование даты для input type="date"
+  const formatDateForInput = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   // Функція для отримання назви послуги
@@ -150,8 +181,6 @@ export default function BarberAdmin({ onLogout }) {
     }, 0);
   };
 
-  // === НОВІ ФУНКЦІЇ ===
-
   // Обробник кліку на клітинку календаря
   const handleCellClick = (barber, time) => {
     const booking = getActiveBooking(barber._id, time);
@@ -180,7 +209,7 @@ export default function BarberAdmin({ onLogout }) {
       return;
     }
 
-    const servicesInput = prompt("💈 Введіть послуги через кому (необов'язково):");
+    const servicesInput = prompt("💈 Введіть послуги або коментар (необов'язково):");
     const services = servicesInput 
       ? servicesInput.split(',').map(s => s.trim()).filter(s => s)
       : [];
@@ -303,8 +332,114 @@ export default function BarberAdmin({ onLogout }) {
             ← Вийти
           </button>
         </div>
-        <div className="header-right">
-          <div className="selected-date">{formatDate(selectedDate)}</div>
+        <div className="header-right" ref={datePickerRef}>
+          {/* Кнопка для открытия календаря */}
+          <button 
+            className="selected-date"
+            onClick={() => setShowDatePicker(!showDatePicker)}
+            style={{
+              cursor: 'pointer',
+              background: '#f8f9fa',
+              border: '1px solid #e9ecef',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              fontSize: '18px',
+              fontWeight: '600',
+              color: '#333',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            📅 {formatDate(selectedDate)}
+          </button>
+          
+          {/* Скрытый input для выбора даты */}
+          {showDatePicker && (
+            <div style={{
+              position: 'absolute',
+              top: '100%',
+              right: 0,
+              marginTop: '8px',
+              background: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+              padding: '20px',
+              zIndex: 1000,
+              minWidth: '300px'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '15px'
+              }}>
+                <h3 style={{ margin: 0 }}>Обрати дату</h3>
+                <button 
+                  onClick={() => setShowDatePicker(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    color: '#666'
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <input
+                type="date"
+                value={formatDateForInput(selectedDate)}
+                onChange={handleDateChange}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  fontSize: '16px',
+                  border: '2px solid #007bff',
+                  borderRadius: '8px',
+                  marginBottom: '15px'
+                }}
+              />
+              
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={goToToday}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    background: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Сьогодні
+                </button>
+                <button
+                  onClick={() => {
+                    const tomorrow = new Date(selectedDate);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    setSelectedDate(tomorrow);
+                    setShowDatePicker(false);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    background: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Завтра
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
