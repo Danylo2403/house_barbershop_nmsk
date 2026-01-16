@@ -1,5 +1,31 @@
+// frontend/src/pages/BarberAdmin.jsx
 import { useEffect, useState, useRef } from "react";
 import "./BarberAdmin.css";
+
+// СЛОВНИК ПОСЛУГ
+const SERVICE_NAMES = {
+  haircut: "Стрижка",
+  haircut_beard: "Стрижка + борода",
+  machine_haircut: "Стрижка під машинку насадками",
+  machine_haircut_beard: "Стрижка під машинку + борода",
+  long_haircut: "Подовжена стрижка",
+  father_son: "Батько + син (до 10 років)",
+  beard_design: "+ оформлення бороди",
+  father_two_sons: "Батько + син + син (до 10 років)",
+  beard_grooming: "Оформлення бороди",
+  haircut_shave: "Стрижка + гоління обличчя",
+  head_shave_beard: "Гоління голови + грумінг бороди",
+  royal_shave: "Королівське гоління голови + бороди",
+  kids_under_10: "Дитяча стрижка до 10 років",
+  teen_10_14: "Підліткова стрижка (10-14 років)",
+  hair_styling: "Укладання волосся",
+  hair_trim: "Окантовка волосся",
+  wax_one_zone: "Воск однієї зони",
+  complex_styling: "Комплекс",
+  head_camouflage: "Камуфляж голови",
+  beard_camouflage: "Камуфляж бороди",
+  head_peeling: "Пілінг голови"
+};
 
 export default function BarberAdmin({ onLogout }) {
   const [barbers, setBarbers] = useState([]);
@@ -9,15 +35,6 @@ export default function BarberAdmin({ onLogout }) {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const datePickerRef = useRef(null);
-  const [weekendDays, setWeekendDays] = useState([]);
-
-  // Состояния для формы создания записи
-  const [showBookingForm, setShowBookingForm] = useState(false);
-  const [formData, setFormData] = useState({
-    barber: null,
-    time: '',
-    note: ''
-  });
 
   // Завантажити барберів
   useEffect(() => {
@@ -34,6 +51,7 @@ export default function BarberAdmin({ onLogout }) {
   useEffect(() => {
     setLoading(true);
     
+    // Получаем локальную дату из selectedDate
     const year = selectedDate.getFullYear();
     const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
     const day = String(selectedDate.getDate()).padStart(2, '0');
@@ -77,7 +95,7 @@ export default function BarberAdmin({ onLogout }) {
     });
   };
 
-  // Часові слоти
+  // Часові слоти (добавлено 19:00)
   const timeSlots = [
     "09:00", "10:00", "11:00", "12:00", 
     "13:00", "14:00", "15:00", "16:00", 
@@ -91,12 +109,6 @@ export default function BarberAdmin({ onLogout }) {
       b.time === time &&
       b.status === "active"
     );
-  };
-
-  // Перевірити чи вихідний день
-  const isWeekendDay = () => {
-    const dayOfWeek = selectedDate.getDay();
-    return dayOfWeek === 0 || dayOfWeek === 6; // 0 = Sunday, 6 = Saturday
   };
 
   // Навігація по днях
@@ -131,64 +143,95 @@ export default function BarberAdmin({ onLogout }) {
     return `${year}-${month}-${day}`;
   };
 
+  // Функція для отримання назви послуги
+  const getServiceName = (serviceId) => {
+    return SERVICE_NAMES[serviceId] || serviceId;
+  };
+
+  // Отримати загальну суму для запису
+  const getTotalPrice = (services) => {
+    const prices = {
+      haircut: 800,
+      haircut_beard: 1000,
+      machine_haircut: 650,
+      machine_haircut_beard: 850,
+      long_haircut: 800,
+      father_son: 1250,
+      beard_design: 300,
+      father_two_sons: 1500,
+      beard_grooming: 700,
+      haircut_shave: 1000,
+      head_shave_beard: 1000,
+      royal_shave: 1000,
+      kids_under_10: 600,
+      teen_10_14: 700,
+      hair_styling: 300,
+      hair_trim: 200,
+      wax_one_zone: 150,
+      complex_styling: 450,
+      head_camouflage: 500,
+      beard_camouflage: 400,
+      head_peeling: 350
+    };
+    
+    if (!services || services.length === 0) return 0;
+    
+    return services.reduce((total, serviceId) => {
+      return total + (prices[serviceId] || 0);
+    }, 0);
+  };
+
   // Обробник кліку на клітинку календаря
   const handleCellClick = (barber, time) => {
     const booking = getActiveBooking(barber._id, time);
     
     if (booking) {
+      // Відкрити деталі існуючого запису
       setSelectedBooking({
         ...booking,
         barberName: barber.name,
         barberColor: barber.color
       });
     } else {
-      openBookingForm(barber, time);
+      // Створити новий запис
+      createNewBooking(barber, time);
     }
   };
 
-  // Відкрити форму створення запису
-  const openBookingForm = (barber, time) => {
-    if (isWeekendDay()) return;
+  // Створити новий запис (барбером)
+  const createNewBooking = async (barber, time) => {
+    const clientName = prompt(`📝 Створити запис для ${barber.name} на ${time}\n\nВведіть ім'я клієнта:`);
+    if (!clientName || clientName.trim() === "") return;
     
-    setFormData({
-      barber,
-      time,
-      note: ''
-    });
-    setShowBookingForm(true);
-  };
+    const phone = prompt("📞 Введіть номер телефону:");
+    if (!phone || phone.trim().length < 10) {
+      alert("❗ Будь ласка, введіть правильний номер телефону (10 цифр)");
+      return;
+    }
 
-  // Закрити форму створення запису
-  const closeBookingForm = () => {
-    setShowBookingForm(false);
-    setFormData({
-      barber: null,
-      time: '',
-      note: ''
-    });
-  };
+    const servicesInput = prompt("💈 Введіть послуги або коментар (необов'язково):");
+    const services = servicesInput 
+      ? servicesInput.split(',').map(s => s.trim()).filter(s => s)
+      : [];
 
-  // Створити новий запис
-  const createNewBooking = async () => {
     try {
       const year = selectedDate.getFullYear();
       const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
       const day = String(selectedDate.getDate()).padStart(2, '0');
       const date = `${year}-${month}-${day}`;
       
-      const startAt = new Date(`${date}T${formData.time}:00`).toISOString();
+      const startAt = new Date(`${date}T${time}:00`).toISOString();
       
-      // Используем note как services
-      const services = formData.note ? [formData.note] : [];
+      console.log("Створення запису:", { barberId: barber._id, date, time, clientName, phone });
       
       const response = await fetch(`/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          barberId: formData.barber._id,
+          barberId: barber._id,
           startAt,
-          phone: "", // Пустая строка
-          clientName: "", // Пустая строка
+          phone: phone.trim(),
+          clientName: clientName.trim(),
           services
         })
       });
@@ -200,9 +243,9 @@ export default function BarberAdmin({ onLogout }) {
       
       const newBooking = await response.json();
       
+      // Оновити список записів
       setBookings(prev => [...prev, newBooking]);
-      closeBookingForm();
-      alert(`✅ Запис створено!\n${formData.barber.name} - ${formData.time}`);
+      alert(`✅ Запис створено!\n${barber.name} - ${time}\n${clientName} - ${phone}`);
       
     } catch (error) {
       console.error("Помилка створення запису:", error);
@@ -230,11 +273,14 @@ export default function BarberAdmin({ onLogout }) {
       
       const cancelledBooking = await response.json();
       
+      // Оновити запис в списку
       setBookings(prev => prev.map(b => 
         b._id === bookingId ? cancelledBooking : b
       ));
       
+      // Закрити модальне вікно
       closeModal();
+      
       alert("✅ Запис скасовано");
       
     } catch (error) {
@@ -257,8 +303,12 @@ export default function BarberAdmin({ onLogout }) {
         throw new Error(error.error || "Помилка видалення");
       }
       
+      // Видалити запис зі списку
       setBookings(prev => prev.filter(b => b._id !== bookingId));
+      
+      // Закрити модальне вікно
       closeModal();
+      
       alert("🗑️ Запис видалено назавжди");
       
     } catch (error) {
@@ -267,17 +317,9 @@ export default function BarberAdmin({ onLogout }) {
     }
   };
 
-  // Закрити модальне вікно деталей запису
+  // Закрити модальне вікно
   const closeModal = () => {
     setSelectedBooking(null);
-  };
-
-  // Получить заметку из записи
-  const getBookingNote = (booking) => {
-    if (booking.services && booking.services.length > 0) {
-      return booking.services[0];
-    }
-    return booking.clientName || "";
   };
 
   return (
@@ -285,46 +327,114 @@ export default function BarberAdmin({ onLogout }) {
       {/* Шапка */}
       <header className="admin-header">
         <div className="header-left">
+          <h1>📅 Адмін-панель барбера</h1>
           <button className="logout-btn" onClick={onLogout}>
             ← Вийти
           </button>
         </div>
-        <div className="header-center">
-          <div className="selected-date">{formatDate(selectedDate)}</div>
-          {isWeekendDay() && <div className="weekend-indicator">Вихідний</div>}
-        </div>
         <div className="header-right" ref={datePickerRef}>
+          {/* Кнопка для открытия календаря */}
           <button 
-            className="date-picker-btn"
+            className="selected-date"
             onClick={() => setShowDatePicker(!showDatePicker)}
+            style={{
+              cursor: 'pointer',
+              background: '#f8f9fa',
+              border: '1px solid #e9ecef',
+              borderRadius: '8px',
+              padding: '8px 16px',
+              fontSize: '18px',
+              fontWeight: '600',
+              color: '#333',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
           >
-            📅
+            📅 {formatDate(selectedDate)}
           </button>
           
+          {/* Скрытый input для выбора даты */}
           {showDatePicker && (
-            <div className="date-picker-dropdown">
-              <div className="date-picker-header">
-                <h3>Обрати дату</h3>
-                <button onClick={() => setShowDatePicker(false)}>✕</button>
+            <div style={{
+              position: 'absolute',
+              // top: '100%',
+              right: 0,
+              marginTop: '8px',
+              background: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+              padding: '20px',
+              zIndex: 1000,
+              minWidth: '300px'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '15px'
+              }}>
+                <h3 style={{ margin: 0 }}>Обрати дату</h3>
+                <button 
+                  onClick={() => setShowDatePicker(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    color: '#666'
+                  }}
+                >
+                  ✕
+                </button>
               </div>
               
               <input
                 type="date"
                 value={formatDateForInput(selectedDate)}
                 onChange={handleDateChange}
-                className="date-input"
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  fontSize: '16px',
+                  border: '2px solid #007bff',
+                  borderRadius: '8px',
+                  marginBottom: '15px'
+                }}
               />
               
-              <div className="date-picker-buttons">
-                <button onClick={goToToday}>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={goToToday}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    background: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
                   Сьогодні
                 </button>
-                <button onClick={() => {
-                  const tomorrow = new Date(selectedDate);
-                  tomorrow.setDate(tomorrow.getDate() + 1);
-                  setSelectedDate(tomorrow);
-                  setShowDatePicker(false);
-                }}>
+                <button
+                  onClick={() => {
+                    const tomorrow = new Date(selectedDate);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    setSelectedDate(tomorrow);
+                    setShowDatePicker(false);
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    background: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
                   Завтра
                 </button>
               </div>
@@ -350,59 +460,59 @@ export default function BarberAdmin({ onLogout }) {
       <main className="calendar-container">
         {loading ? (
           <div className="loading">Завантаження...</div>
-        ) : isWeekendDay() ? (
-          <div className="weekend-message">
-            <h3>Вихідний день</h3>
-            <p>На цей день записів немає</p>
-          </div>
         ) : (
-          <table className="calendar-table">
-            <thead>
-              <tr>
-                <th className="time-header">Час</th>
-                {barbers.map(barber => (
-                  <th 
-                    key={barber._id} 
-                    className="barber-header"
-                    style={{ backgroundColor: barber.color }}
-                  >
-                    {barber.name}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {timeSlots.map(time => (
-                <tr key={time} className="time-row">
-                  <td className="time-cell">{time}</td>
-                  
-                  {barbers.map(barber => {
-                    const booking = getActiveBooking(barber._id, time);
-                    const note = booking ? getBookingNote(booking) : '';
-                    
-                    return (
-                      <td
-                        key={`${barber._id}-${time}`}
-                        className={`booking-cell ${booking ? "booked" : "free"}`}
-                        style={{
-                          backgroundColor: booking ? barber.color : "transparent"
-                        }}
-                        onClick={() => handleCellClick(barber, time)}
-                      >
-                        {booking ? (
-                          <div className="booking-note">
-                            {note}
-                          </div>
-                        ) : (
-                          <span className="free-slot">+</span>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
+          <div className="multi-calendar">
+            {/* Заголовок з іменами барберів */}
+            <div className="calendar-header">
+              <div className="time-column">Час</div>
+              {barbers.map(barber => (
+                <div 
+                  key={barber._id} 
+                  className="barber-column-header"
+                  style={{ backgroundColor: barber.color }}
+                >
+                  {barber.name}
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+
+            {/* Часові рядки */}
+            {timeSlots.map(time => (
+              <div key={time} className="time-row">
+                <div className="time-cell">{time}</div>
+                
+                {barbers.map(barber => {
+                  const booking = getActiveBooking(barber._id, time);
+                  
+                  return (
+                    <div
+                      key={`${barber._id}-${time}`}
+                      className={`booking-cell ${booking ? "booked" : "free"}`}
+                      style={{
+                        backgroundColor: booking ? barber.color : "transparent",
+                        borderColor: barber.color
+                      }}
+                      onClick={() => handleCellClick(barber, time)}
+                    >
+                      {booking ? (
+                        <div className="booking-info">
+                          <div className="client-name">{booking.clientName}</div>
+                          <div className="client-phone">{booking.phone}</div>
+                          {booking.services && booking.services.length > 0 && (
+                            <div className="service-indicator">
+                              💈 {booking.services.length}
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="free-text">+</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         )}
       </main>
 
@@ -423,56 +533,37 @@ export default function BarberAdmin({ onLogout }) {
             <div className="color-box free">—</div>
             <span>Вільно</span>
           </div>
+          <div className="legend-item">
+            <div className="color-box indicator">💈</div>
+            <span>Є послуги</span>
+          </div>
         </div>
       </div>
 
-      {/* Форма створення запису */}
-      {showBookingForm && (
-        <div className="form-modal-overlay" onClick={closeBookingForm}>
-          <div className="form-modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="form-modal-header">
-              <h2>Створити запис</h2>
-              <button className="form-modal-close" onClick={closeBookingForm}>
-                ×
-              </button>
+      {/* Статистика */}
+      <footer className="stats-footer">
+        <div className="stats">
+          <div className="stat-item">
+            <div className="stat-number">
+              {bookings.filter(b => b.status === "active").length}
             </div>
-            
-            <div className="form-modal-body">
-              <div className="form-info">
-                <p><strong>Барбер:</strong> {formData.barber.name}</p>
-                <p><strong>Час:</strong> {formData.time}</p>
-                <p><strong>Дата:</strong> {formatDate(selectedDate)}</p>
-              </div>
-              
-              <div className="form-group">
-                <label>Замітка (необов'язково)</label>
-                <textarea
-                  value={formData.note}
-                  onChange={(e) => setFormData({...formData, note: e.target.value})}
-                  placeholder="Введіть замітку..."
-                  rows={4}
-                  autoFocus
-                />
-              </div>
+            <div className="stat-label">Активних записів</div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-number">{barbers.length}</div>
+            <div className="stat-label">Барберів</div>
+          </div>
+          <div className="stat-item">
+            <div className="stat-number">
+              {new Date().toLocaleTimeString('uk-UA', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+              })}
             </div>
-            
-            <div className="form-modal-footer">
-              <button 
-                className="modal-btn cancel-btn"
-                onClick={closeBookingForm}
-              >
-                Скасувати
-              </button>
-              <button 
-                className="modal-btn save-btn"
-                onClick={createNewBooking}
-              >
-                Створити запис
-              </button>
-            </div>
+            <div className="stat-label">Час</div>
           </div>
         </div>
-      )}
+      </footer>
 
       {/* Модальне вікно деталей запису */}
       {selectedBooking && (
@@ -518,15 +609,37 @@ export default function BarberAdmin({ onLogout }) {
                 <div className="detail-value time">{selectedBooking.time}</div>
               </div>
               
-              {/* Замітка */}
+              {/* Клієнт */}
               <div className="detail-section">
-                <h3>📝 Замітка</h3>
-                {getBookingNote(selectedBooking) ? (
-                  <div className="booking-note-detail">
-                    {getBookingNote(selectedBooking)}
-                  </div>
+                <h3>👤 Клієнт</h3>
+                <div className="detail-row">
+                  <div className="detail-label">Ім'я:</div>
+                  <div className="detail-value">{selectedBooking.clientName}</div>
+                </div>
+                <div className="detail-row">
+                  <div className="detail-label">Телефон:</div>
+                  <div className="detail-value phone">{selectedBooking.phone}</div>
+                </div>
+              </div>
+              
+              {/* Послуги */}
+              <div className="detail-section">
+                <h3>💈 Послуги</h3>
+                {selectedBooking.services && selectedBooking.services.length > 0 ? (
+                  <>
+                    <div className="services-list">
+                      {selectedBooking.services.map((serviceId, index) => (
+                        <div key={index} className="service-item">
+                          <div className="service-name">{getServiceName(serviceId)}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="total-price">
+                      Загальна сума: <strong>{getTotalPrice(selectedBooking.services)} грн</strong>
+                    </div>
+                  </>
                 ) : (
-                  <div className="no-note">Замітка відсутня</div>
+                  <div className="no-services">Послуги не вказані</div>
                 )}
               </div>
               
@@ -574,6 +687,13 @@ export default function BarberAdmin({ onLogout }) {
                   🗑️ Видалити
                 </button>
               )}
+              
+              <button 
+                className="modal-btn call-btn"
+                onClick={() => window.open(`tel:${selectedBooking.phone}`)}
+              >
+                📞 Зателефонувати
+              </button>
             </div>
           </div>
         </div>
