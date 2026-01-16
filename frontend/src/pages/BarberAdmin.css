@@ -1081,16 +1081,3 @@
     opacity: 1;
   }
 }
-
-/* Изменения для фиксации высоты и прокрутки календаря */
-.barber-admin {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-}
-
-.calendar-container {
-  flex: 1;
-  overflow-y: auto;
-}
