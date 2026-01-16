@@ -1,4 +1,3 @@
-// frontend/src/pages/BarberAdmin.jsx
 import { useEffect, useState, useRef } from "react";
 import "./BarberAdmin.css";
 
@@ -35,6 +34,16 @@ export default function BarberAdmin({ onLogout }) {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const datePickerRef = useRef(null);
+
+  // Состояния для формы создания записи
+  const [showBookingForm, setShowBookingForm] = useState(false);
+  const [formData, setFormData] = useState({
+    barber: null,
+    time: '',
+    clientName: '',
+    phone: '',
+    services: ''
+  });
 
   // Завантажити барберів
   useEffect(() => {
@@ -193,26 +202,41 @@ export default function BarberAdmin({ onLogout }) {
         barberColor: barber.color
       });
     } else {
-      // Створити новий запис
-      createNewBooking(barber, time);
+      // Відкрити форму для створення запису
+      openBookingForm(barber, time);
     }
   };
 
+  // Відкрити форму створення запису
+  const openBookingForm = (barber, time) => {
+    setFormData({
+      barber,
+      time,
+      clientName: '',
+      phone: '',
+      services: ''
+    });
+    setShowBookingForm(true);
+  };
+
+  // Закрити форму створення запису
+  const closeBookingForm = () => {
+    setShowBookingForm(false);
+    setFormData({
+      barber: null,
+      time: '',
+      clientName: '',
+      phone: '',
+      services: ''
+    });
+  };
+
   // Створити новий запис (барбером)
-  const createNewBooking = async (barber, time) => {
-    const clientName = prompt(`📝 Створити запис для ${barber.name} на ${time}\n\nВведіть ім'я клієнта:`);
-    if (!clientName || clientName.trim() === "") return;
-    
-    const phone = prompt("📞 Введіть номер телефону:");
-    if (!phone || phone.trim().length < 10) {
-      alert("❗ Будь ласка, введіть правильний номер телефону (10 цифр)");
+  const createNewBooking = async () => {
+    if (!formData.clientName.trim()) {
+      alert("Будь ласка, введіть ім'я клієнта");
       return;
     }
-
-    const servicesInput = prompt("💈 Введіть послуги або коментар (необов'язково):");
-    const services = servicesInput 
-      ? servicesInput.split(',').map(s => s.trim()).filter(s => s)
-      : [];
 
     try {
       const year = selectedDate.getFullYear();
@@ -220,18 +244,29 @@ export default function BarberAdmin({ onLogout }) {
       const day = String(selectedDate.getDate()).padStart(2, '0');
       const date = `${year}-${month}-${day}`;
       
-      const startAt = new Date(`${date}T${time}:00`).toISOString();
+      const startAt = new Date(`${date}T${formData.time}:00`).toISOString();
       
-      console.log("Створення запису:", { barberId: barber._id, date, time, clientName, phone });
+      // Парсим послуги
+      const services = formData.services
+        ? formData.services.split(',').map(s => s.trim()).filter(s => s)
+        : [];
+      
+      console.log("Створення запису:", { 
+        barberId: formData.barber._id, 
+        date, 
+        time: formData.time, 
+        clientName: formData.clientName,
+        phone: formData.phone || 'не вказано'
+      });
       
       const response = await fetch(`/api/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          barberId: barber._id,
+          barberId: formData.barber._id,
           startAt,
-          phone: phone.trim(),
-          clientName: clientName.trim(),
+          phone: formData.phone ? formData.phone.trim() : "",
+          clientName: formData.clientName.trim(),
           services
         })
       });
@@ -245,7 +280,16 @@ export default function BarberAdmin({ onLogout }) {
       
       // Оновити список записів
       setBookings(prev => [...prev, newBooking]);
-      alert(`✅ Запис створено!\n${barber.name} - ${time}\n${clientName} - ${phone}`);
+      
+      // Закрыть форму
+      closeBookingForm();
+      
+      // Показати відповідне повідомлення
+      if (formData.phone && formData.phone.trim()) {
+        alert(`✅ Запис створено!\n${formData.barber.name} - ${formData.time}\n${formData.clientName} - ${formData.phone}`);
+      } else {
+        alert(`✅ Запис створено!\n${formData.barber.name} - ${formData.time}\n${formData.clientName}`);
+      }
       
     } catch (error) {
       console.error("Помилка створення запису:", error);
@@ -317,7 +361,7 @@ export default function BarberAdmin({ onLogout }) {
     }
   };
 
-  // Закрити модальне вікно
+  // Закрити модальне вікно деталей запису
   const closeModal = () => {
     setSelectedBooking(null);
   };
@@ -358,7 +402,6 @@ export default function BarberAdmin({ onLogout }) {
           {showDatePicker && (
             <div style={{
               position: 'absolute',
-              // top: '100%',
               right: 0,
               marginTop: '8px',
               background: 'white',
@@ -497,7 +540,13 @@ export default function BarberAdmin({ onLogout }) {
                       {booking ? (
                         <div className="booking-info">
                           <div className="client-name">{booking.clientName}</div>
-                          <div className="client-phone">{booking.phone}</div>
+                          {booking.phone ? (
+                            <div className="client-phone">{booking.phone}</div>
+                          ) : (
+                            <div className="no-phone-indicator" title="Телефон не вказано">
+                              📵
+                            </div>
+                          )}
                           {booking.services && booking.services.length > 0 && (
                             <div className="service-indicator">
                               💈 {booking.services.length}
@@ -537,6 +586,10 @@ export default function BarberAdmin({ onLogout }) {
             <div className="color-box indicator">💈</div>
             <span>Є послуги</span>
           </div>
+          <div className="legend-item">
+            <div className="color-box no-phone">📵</div>
+            <span>Без телефону</span>
+          </div>
         </div>
       </div>
 
@@ -564,6 +617,82 @@ export default function BarberAdmin({ onLogout }) {
           </div>
         </div>
       </footer>
+
+      {/* Форма створення запису */}
+      {showBookingForm && (
+        <div className="form-modal-overlay" onClick={closeBookingForm}>
+          <div className="form-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="form-modal-header">
+              <h2>Створити запис</h2>
+              <button className="form-modal-close" onClick={closeBookingForm}>
+                ×
+              </button>
+            </div>
+            
+            <div className="form-modal-body">
+              <div className="form-info">
+                <p><strong>Барбер:</strong> {formData.barber.name}</p>
+                <p><strong>Час:</strong> {formData.time}</p>
+                <p><strong>Дата:</strong> {formatDate(selectedDate)}</p>
+              </div>
+              
+              <div className="form-group">
+                <label>Ім'я клієнта *</label>
+                <input
+                  type="text"
+                  value={formData.clientName}
+                  onChange={(e) => setFormData({...formData, clientName: e.target.value})}
+                  placeholder="Введіть ім'я"
+                  required
+                  autoFocus
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Номер телефону (необов'язково)</label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  placeholder="+38 (___) ___-__-__"
+                />
+                <div className="form-hint">
+                  Можна залишити пустим, якщо клієнт не надав телефон
+                </div>
+              </div>
+              
+              <div className="form-group">
+                <label>Послуги або коментар (необов'язково)</label>
+                <textarea
+                  value={formData.services}
+                  onChange={(e) => setFormData({...formData, services: e.target.value})}
+                  placeholder="Введіть послуги через кому або коментар"
+                  rows={3}
+                />
+                <div className="form-hint">
+                  Наприклад: "стрижка, оформлення бороди" або "постійний клієнт"
+                </div>
+              </div>
+            </div>
+            
+            <div className="form-modal-footer">
+              <button 
+                className="modal-btn cancel-btn"
+                onClick={closeBookingForm}
+              >
+                Скасувати
+              </button>
+              <button 
+                className="modal-btn save-btn"
+                onClick={createNewBooking}
+                disabled={!formData.clientName.trim()}
+              >
+                Створити запис
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Модальне вікно деталей запису */}
       {selectedBooking && (
@@ -618,7 +747,33 @@ export default function BarberAdmin({ onLogout }) {
                 </div>
                 <div className="detail-row">
                   <div className="detail-label">Телефон:</div>
-                  <div className="detail-value phone">{selectedBooking.phone}</div>
+                  <div className="detail-value phone">
+                    {selectedBooking.phone ? (
+                      <>
+                        {selectedBooking.phone}
+                        <button 
+                          className="call-btn-small"
+                          onClick={() => window.open(`tel:${selectedBooking.phone}`)}
+                          style={{
+                            marginLeft: '10px',
+                            padding: '4px 8px',
+                            fontSize: '12px',
+                            background: '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          📞
+                        </button>
+                      </>
+                    ) : (
+                      <span style={{ color: '#6c757d', fontStyle: 'italic' }}>
+                        Не вказано
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
               
@@ -690,9 +845,16 @@ export default function BarberAdmin({ onLogout }) {
               
               <button 
                 className="modal-btn call-btn"
-                onClick={() => window.open(`tel:${selectedBooking.phone}`)}
+                onClick={() => {
+                  if (selectedBooking.phone) {
+                    window.open(`tel:${selectedBooking.phone}`);
+                  } else {
+                    alert("У цього клієнта не вказано номер телефону");
+                  }
+                }}
+                disabled={!selectedBooking.phone}
               >
-                📞 Зателефонувати
+                📞 {selectedBooking.phone ? 'Зателефонувати' : 'Телефон відсутній'}
               </button>
             </div>
           </div>

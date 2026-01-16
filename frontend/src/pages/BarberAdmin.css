@@ -1081,3 +1081,216 @@
     opacity: 1;
   }
 }
+
+/* ..................................................... */
+/* Стили для индикатора отсутствия телефона */
+.no-phone-indicator {
+  font-size: 10px;
+  color: #ffc107;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 5px;
+  border-radius: 10px;
+  margin-top: 3px;
+  display: inline-block;
+}
+
+.color-box.no-phone {
+  background: white;
+  border: 1px solid #ffc107;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #ffc107;
+}
+
+/* Стили для формы создания записи */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-group input[type="tel"] {
+  font-family: monospace;
+}
+
+.form-hint {
+  font-size: 13px;
+  color: #6c757d;
+  margin-top: 6px;
+  font-style: italic;
+}
+
+/* Стили для отключенных кнопок */
+.modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #6c757d !important;
+}
+
+.modal-btn:disabled:hover {
+  background-color: #6c757d !important;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Кнопка сохранения в форме */
+.save-btn {
+  background: #28a745;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #218838;
+}
+
+/* Маленькая кнопка звонка в деталях */
+.call-btn-small {
+  margin-left: 10px;
+  padding: 4px 8px;
+  font-size: 12px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.call-btn-small:hover {
+  background: #218838;
+  transform: scale(1.05);
+}
+
+/* Адаптация формы создания записи для мобильных */
+@media (max-width: 768px) {
+  .form-modal-footer {
+    flex-direction: column;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-modal-content {
+    max-width: 100%;
+    border-radius: 12px 12px 0 0;
+    margin-top: auto;
+  }
+
+  .form-modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .form-modal-header {
+    padding: 15px;
+  }
+
+  .form-modal-header h2 {
+    font-size: 18px;
+  }
+
+  .form-modal-body {
+    padding: 15px;
+  }
+
+  .form-info {
+    padding: 15px;
+  }
+
+  .form-info p {
+    font-size: 14px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+  }
+}
+
+/* Стили для модального окна с телефоном */
+.detail-value.phone {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Анимации для формы */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* В медиа-запросе для очень маленьких экранов (max-width: 480px) добавьте: */
+@media (max-width: 480px) {
+  /* ... существующие стили ... */
+
+  .no-phone-indicator {
+    font-size: 8px;
+    padding: 1px 3px;
+  }
+
+  .call-btn-small {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+}
+
+/* В медиа-запросе для мобильных устройств (max-width: 768px) добавьте: */
+@media (max-width: 768px) {
+  /* ... существующие стили ... */
+
+  .form-modal-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-btn {
+    min-height: 48px;
+    font-size: 14px;
+  }
+}
