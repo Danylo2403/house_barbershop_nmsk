@@ -358,7 +358,7 @@ export default function BarberAdmin({ onLogout }) {
           {showDatePicker && (
             <div style={{
               position: 'absolute',
-              top: '100%',
+              // top: '100%',
               right: 0,
               marginTop: '8px',
               background: 'white',
