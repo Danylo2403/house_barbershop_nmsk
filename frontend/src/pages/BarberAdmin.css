@@ -1,4 +1,3 @@
-/* frontend/src/pages/BarberAdmin.css */
 .barber-admin {
   min-height: 100vh;
   background: #f5f5f5;
@@ -91,7 +90,8 @@
 /* Календар */
 .calendar-container {
   background: white;
-  border-radius: 10px;
+  border: 1px solid #ddd;
+  border-radius: 0;
   overflow: hidden;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
@@ -106,7 +106,7 @@
   display: flex;
   background: #343a40;
   color: white;
-  border-bottom: 2px solid #495057;
+  border-bottom: 1px solid #495057;
 }
 
 .time-column {
@@ -126,11 +126,12 @@
   text-align: center;
   font-weight: 600;
   color: white;
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
   min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: inherit;
 }
 
 .barber-column-header:last-child {
@@ -140,8 +141,9 @@
 /* Часові рядки */
 .time-row {
   display: flex;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #ddd;
   min-height: 70px;
+  background: white;
 }
 
 .time-row:last-child {
@@ -157,7 +159,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid #eee;
+  border-right: 1px solid #ddd;
   font-size: 14px;
   color: #495057;
 }
@@ -165,9 +167,9 @@
 .booking-cell {
   flex: 1;
   padding: 10px;
-  border: 2px solid;
-  margin: 1px;
-  border-radius: 6px;
+  border: 1px solid #ddd;
+  margin: 0;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -175,23 +177,33 @@
   transition: all 0.2s;
   min-height: 65px;
   position: relative;
+  background: white;
 }
 
 .booking-cell:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 2;
+  border-color: #007bff;
 }
 
 .booking-cell.booked {
   color: white;
+  border: 1px solid transparent;
+}
+
+.booking-cell.booked:hover {
+  border-color: #007bff;
 }
 
 .booking-cell.free {
+  background: white;
+  border: 1px solid #ddd;
+  color: #adb5bd;
+}
+
+.booking-cell.free:hover {
   background: #f8f9fa;
-  border-color: #dee2e6;
-  /* border-style: dashed; */
-  border-style: solid;
 }
 
 .booking-info {
@@ -238,12 +250,14 @@
   align-items: center;
   justify-content: center;
   font-size: 12px;
+  border-radius: 4px;
 }
 
 /* Легенда */
 .legend {
   background: white;
-  border-radius: 10px;
+  border: 1px solid #ddd;
+  border-radius: 0;
   padding: 15px;
   margin-bottom: 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -270,25 +284,26 @@
 .color-box {
   width: 20px;
   height: 20px;
-  border-radius: 4px;
+  border-radius: 0;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .color-box.free {
   background: white;
-  /* border: 2px dashed #dee2e6; */
-  border: 2px solid #dee2e6;
+  border: 1px solid #ddd;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
   color: #adb5bd;
+  border-radius: 0;
 }
 
 /* Статистика */
 .stats-footer {
   background: white;
-  border-radius: 10px;
+  border: 1px solid #ddd;
+  border-radius: 0;
   padding: 15px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -361,23 +376,27 @@
     width: 60px;
     padding: 10px 5px;
     font-size: 12px;
+    min-width: 60px;
   }
 
   .barber-column-header {
     min-width: 100px;
     padding: 10px 5px;
     font-size: 13px;
+    flex-shrink: 0;
   }
 
   .time-cell {
     width: 60px;
     padding: 8px 5px;
     font-size: 12px;
+    min-width: 60px;
   }
 
   .booking-cell {
     min-width: 100px;
     min-height: 60px;
+    flex-shrink: 0;
   }
 
   .client-name {
@@ -466,7 +485,8 @@
 
 .modal-content {
   background: white;
-  border-radius: 16px;
+  border-radius: 0;
+  border: 1px solid #ddd;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
@@ -491,11 +511,10 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #ddd;
   position: sticky;
   top: 0;
   background: white;
-  border-radius: 16px 16px 0 0;
   z-index: 10;
 }
 
@@ -516,7 +535,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 0;
   transition: all 0.2s;
 }
 
@@ -532,7 +551,7 @@
 .detail-section {
   margin-bottom: 25px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #ddd;
 }
 
 .detail-section:last-child {
@@ -554,10 +573,14 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .detail-row:last-child {
   margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .detail-label {
@@ -600,7 +623,8 @@
 /* Список послуг */
 .services-list {
   background: #f8f9fa;
-  border-radius: 10px;
+  border: 1px solid #ddd;
+  border-radius: 0;
   padding: 15px;
   margin: 15px 0;
 }
@@ -608,9 +632,8 @@
 .service-item {
   padding: 10px;
   background: white;
-  border-radius: 8px;
+  border: 1px solid #ddd;
   margin-bottom: 8px;
-  border: 1px solid #e9ecef;
   transition: all 0.2s;
 }
 
@@ -632,7 +655,7 @@
 .no-services {
   padding: 15px;
   background: #f8f9fa;
-  border-radius: 8px;
+  border: 1px solid #ddd;
   text-align: center;
   color: #6c757d;
   font-style: italic;
@@ -645,9 +668,9 @@
   color: #28a745;
   padding: 15px;
   background: #e8f5e9;
-  border-radius: 10px;
-  margin-top: 15px;
   border: 2px solid #c3e6cb;
+  border-radius: 0;
+  margin-top: 15px;
 }
 
 /* Футер модального вікна */
@@ -655,16 +678,15 @@
   display: flex;
   gap: 10px;
   padding: 20px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #ddd;
   background: #f8f9fa;
-  border-radius: 0 0 16px 16px;
 }
 
 .modal-btn {
   flex: 1;
   padding: 14px;
-  border: none;
-  border-radius: 10px;
+  border: 1px solid #ddd;
+  border-radius: 0;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -673,24 +695,29 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  background: white;
 }
 
 .close-btn {
   background: #6c757d;
   color: white;
+  border-color: #6c757d;
 }
 
 .close-btn:hover {
   background: #5a6268;
+  border-color: #5a6268;
 }
 
 .call-btn {
   background: #28a745;
   color: white;
+  border-color: #28a745;
 }
 
 .call-btn:hover {
   background: #218838;
+  border-color: #218838;
 }
 
 /* Адаптація для мобільних */
@@ -713,9 +740,6 @@
   }
 
   .detail-row {
-    /* flex-direction: column; */
-    /* align-items: flex-start; */
-    /* gap: 5px; */
     gap: 10px;
   }
 
@@ -749,7 +773,6 @@
 @media (max-width: 480px) {
   .modal-content {
     max-width: 100%;
-    border-radius: 12px 12px 0 0;
     margin-top: auto;
     animation: slideUpMobile 0.3s ease;
   }
@@ -770,34 +793,38 @@
 }
 
 /* frontend/src/pages/BarberAdmin.css */
-/* Добавьте эти стили в существующий файл */
-
 /* Стили для кнопок управления */
 .cancel-btn {
   background: #dc3545;
   color: white;
+  border-color: #dc3545;
 }
 
 .cancel-btn:hover {
   background: #c82333;
+  border-color: #c82333;
 }
 
 .restore-btn {
   background: #17a2b8;
   color: white;
+  border-color: #17a2b8;
 }
 
 .restore-btn:hover {
   background: #138496;
+  border-color: #138496;
 }
 
 .delete-btn {
   background: #6c757d;
   color: white;
+  border-color: #6c757d;
 }
 
 .delete-btn:hover {
   background: #5a6268;
+  border-color: #5a6268;
 }
 
 /* Стили для скасованих записів */
@@ -828,7 +855,6 @@
   border: 1px solid #ffeaa7;
   color: #856404;
   padding: 10px;
-  border-radius: 8px;
   margin-bottom: 15px;
   font-weight: 600;
   text-align: center;
@@ -850,15 +876,14 @@
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 10px;
   padding: 20px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #ddd;
   background: #f8f9fa;
-  border-radius: 0 0 16px 16px;
 }
 
 .modal-btn {
   padding: 12px;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid #ddd;
+  border-radius: 0;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -868,6 +893,7 @@
   justify-content: center;
   gap: 6px;
   min-height: 44px;
+  background: white;
 }
 
 /* Для мобильных устройств */
@@ -888,7 +914,6 @@
   }
 }
 
-/* ......... */
 /* Стили для формы создания */
 .form-modal-overlay {
   position: fixed;
@@ -908,7 +933,7 @@
 
 .form-modal-content {
   background: white;
-  border-radius: 20px;
+  border: 1px solid #ddd;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
@@ -922,9 +947,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 25px 30px 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #ddd;
   background: white;
-  border-radius: 20px 20px 0 0;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -938,7 +962,7 @@
 
 .form-modal-close {
   background: #f8f9fa;
-  border: none;
+  border: 1px solid #ddd;
   font-size: 28px;
   color: #666;
   cursor: pointer;
@@ -947,7 +971,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 0;
   transition: all 0.2s;
 }
 
@@ -963,7 +987,7 @@
 
 .form-info {
   background: #f8f9fa;
-  border-radius: 12px;
+  border: 1px solid #ddd;
   padding: 20px;
   margin-bottom: 25px;
   border-left: 4px solid #007bff;
@@ -987,7 +1011,7 @@
   color: #6c757d;
   background: #f8f9fa;
   padding: 3px 8px;
-  border-radius: 12px;
+  border: 1px solid #ddd;
   margin-left: 10px;
 }
 
@@ -1000,6 +1024,7 @@
 .booking-cell.unavailable:hover {
   transform: none !important;
   box-shadow: none !important;
+  border-color: #ddd !important;
 }
 
 /* Подсказка о длительности в календаре */
@@ -1044,7 +1069,6 @@
 @media (max-width: 480px) {
   .form-modal-content {
     max-width: 100%;
-    border-radius: 16px 16px 0 0;
     margin-top: auto;
   }
 
