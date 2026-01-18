@@ -28,6 +28,7 @@
   border: none;
   font-weight: bold;
   cursor: pointer;
+  color: #000;
 }
 
 @media (max-width: 900px) {
@@ -40,5 +41,19 @@
   .barbers {
     grid-template-columns: 1fr;
     padding: 20px;
+  }
+
+  .barber-card h3 {
+    font-size: 22px; /* имя барбера больше */
+  }
+
+  .barber-card p {
+    font-size: 16px; /* специализация больше */
+  }
+
+  .barber-card button {
+    font-size: 18px; /* текст "Записатись" больше */
+    padding: 14px 20px; /* кнопка выше и шире */
+    width: 100%; /* удобно для пальца */
   }
 }
